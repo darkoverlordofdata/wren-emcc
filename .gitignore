@@ -1,0 +1,6 @@
+.vscode/ipch
+.ionide
+*.bc
+## Build generated
+build/
+external/

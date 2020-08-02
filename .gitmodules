@@ -1,0 +1,15 @@
+[submodule "external/blocksruntime"]
+	path = external/blocksruntime
+	url = https://github.com/mackyle/blocksruntime.git
+[submodule "external/corefw"]
+	path = external/corefw
+	url = https://github.com/midar/corefw.git
+[submodule "external/stb"]
+	path = external/stb
+	url = https://github.com/nothings/stb.git
+[submodule "external/linmath.h"]
+	path = external/linmath.h
+	url = https://github.com/datenwolf/linmath.h.git
+[submodule "external/wren"]
+	path = external/wren
+	url = https://github.com/wren-lang/wren.git

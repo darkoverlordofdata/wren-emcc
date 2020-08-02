@@ -1,0 +1,9 @@
+set(SOURCE
+   ${SOURCE}
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/cfw.c
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/cfwfs.c
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/bitvector.c
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/random.c
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/uuid.c
+   PARENT_SCOPE
+)
