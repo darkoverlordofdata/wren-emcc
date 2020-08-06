@@ -30,7 +30,7 @@ SOFTWARE.
  * using clang vector extensions and function overload.
  * 
  */
-#include "tglm.h"
+#include "tglm/tglm.h"
 
 /**
  * clamp number/vector between MIN and MAX values

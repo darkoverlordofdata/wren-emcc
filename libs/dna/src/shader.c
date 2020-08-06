@@ -24,7 +24,7 @@ static void dtor(void* self)
     DNAShader* this = self;
 }
 
-method void* New(DNAShader* this, CFWString* vShader, CFWString* fShader)
+overloadable void* New(DNAShader* this, CFWString* vShader, CFWString* fShader)
 {
     Compile(this, cfw_string_c(vShader), cfw_string_c(fShader));
     return this;
@@ -32,7 +32,7 @@ method void* New(DNAShader* this, CFWString* vShader, CFWString* fShader)
 /**
  * Use shader
  */
-method DNAShader* Use(DNAShader* this)
+overloadable DNAShader* Use(DNAShader* this)
 {
     glUseProgram(this->Id);
     return this;
@@ -74,7 +74,7 @@ void CheckCompileErrors(
  * @param fragmentSource fragment shader source code
  * 
  */
-method void Compile(
+overloadable void Compile(
     DNAShader* this,
     const GLchar* vShaderSrc,
     const GLchar* fShaderSrc)
@@ -102,7 +102,7 @@ method void Compile(
     glDeleteShader(sFragment);
 }
 
-method void SetFloat(
+overloadable void SetFloat(
     DNAShader* this,
     const GLchar* name,
     const GLfloat value,
@@ -113,7 +113,7 @@ method void SetFloat(
     glUniform1f(glGetUniformLocation(this->Id, name), value);
 }
 
-method void SetFloat(
+overloadable void SetFloat(
     DNAShader* this,
     const GLchar* name,
     const GLfloat value)
@@ -121,7 +121,7 @@ method void SetFloat(
     SetFloat(this, name, value, true);
 }
 
-method void SetInteger(
+overloadable void SetInteger(
     DNAShader* this,
     const GLchar* name,
     GLint value,
@@ -132,7 +132,7 @@ method void SetInteger(
     glUniform1i(glGetUniformLocation(this->Id, name), value);
 }
 
-method void SetInteger(
+overloadable void SetInteger(
     DNAShader* this,
     const GLchar* name,
     GLint value)
@@ -140,7 +140,7 @@ method void SetInteger(
     SetInteger(this, name, value, true);
 }
 
-method void SetVector2(
+overloadable void SetVector2(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -152,7 +152,7 @@ method void SetVector2(
     glUniform2f(glGetUniformLocation(this->Id, name), x, y);
 }
 
-method void SetVector2(
+overloadable void SetVector2(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -161,7 +161,7 @@ method void SetVector2(
     SetVector2(this, name, x, y, true);
 }
 
-method void SetVector2v(
+overloadable void SetVector2v(
     DNAShader* this,
     const GLchar* name,
     const Vec2* vector,
@@ -172,7 +172,7 @@ method void SetVector2v(
     glUniform2fv(glGetUniformLocation(this->Id, name), 1, (GLfloat*)vector);
 }
 
-method void SetVector2v(
+overloadable void SetVector2v(
     DNAShader* this,
     const GLchar* name,
     const Vec2* vector)
@@ -180,7 +180,7 @@ method void SetVector2v(
     SetVector2v(this, name, vector, true);
 }
 
-method void SetVector3(
+overloadable void SetVector3(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -193,7 +193,7 @@ method void SetVector3(
     glUniform3f(glGetUniformLocation(this->Id, name), x, y, z);
 }
 
-method void SetVector3(
+overloadable void SetVector3(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -203,7 +203,7 @@ method void SetVector3(
     SetVector3(this, name, x, y, z, true);
 }
 
-method void SetVector3v(
+overloadable void SetVector3v(
     DNAShader* this,
     const GLchar* name,
     const Vec3* vector,
@@ -214,7 +214,7 @@ method void SetVector3v(
     glUniform3fv(glGetUniformLocation(this->Id, name), 1, (GLfloat*)vector);
 }
 
-method void SetVector3v(
+overloadable void SetVector3v(
     DNAShader* this,
     const GLchar* name,
     const Vec3* vector)
@@ -222,7 +222,7 @@ method void SetVector3v(
     SetVector3v(this, name, vector, true);
 }
 
-method void SetVector4(
+overloadable void SetVector4(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -236,7 +236,7 @@ method void SetVector4(
     glUniform4f(glGetUniformLocation(this->Id, name), x, y, z, w);
 }
 
-method void SetVector4(
+overloadable void SetVector4(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -247,7 +247,7 @@ method void SetVector4(
     SetVector4(this, name, x, y, z, w, true);
 }
 
-method void SetVector4v(
+overloadable void SetVector4v(
     DNAShader* this,
     const GLchar* name,
     const Vec4* vector,
@@ -258,7 +258,7 @@ method void SetVector4v(
     glUniform4fv(glGetUniformLocation(this->Id, name), 1, (GLfloat*)vector);
 }
 
-method void SetVector4v(
+overloadable void SetVector4v(
     DNAShader* this,
     const GLchar* name,
     const Vec4* vector)
@@ -266,7 +266,7 @@ method void SetVector4v(
     SetVector4v(this, name, vector, true);
 }
 
-method void SetMatrix(
+overloadable void SetMatrix(
     DNAShader* this,
     const GLchar* name,
     const Mat* matrix,
@@ -277,7 +277,7 @@ method void SetMatrix(
     glUniformMatrix4fv(glGetUniformLocation(this->Id, name), 1, GL_FALSE, (GLfloat*)matrix);
 }
 
-method void SetMatrix(
+overloadable void SetMatrix(
     DNAShader* this,
     const GLchar* name,
     const Mat* matrix)

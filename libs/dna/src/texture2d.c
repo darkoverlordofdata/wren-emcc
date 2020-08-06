@@ -28,7 +28,7 @@ static void dtor(void* self) {}
  * @param imageFormat
  * @param path to image
  */
-method void* New(DNATexture2D* this, GLuint internalFormat, GLuint imageFormat, char* path)
+overloadable void* New(DNATexture2D* this, GLuint internalFormat, GLuint imageFormat, char* path)
 {
     // DNATexture2D* this = cfw_new((CFWClass*)DNATexture2DClass);
     this->path = cfw_strdup(path);
@@ -52,7 +52,7 @@ method void* New(DNATexture2D* this, GLuint internalFormat, GLuint imageFormat, 
  * @param data bitmap data
  * 
  */
-method void Generate(
+overloadable void Generate(
     DNATexture2D* this,
     GLuint width,
     GLuint height,
@@ -77,12 +77,12 @@ method void Generate(
  * 
  * binds the texture to GL
  */
-method void Bind(const DNATexture2D* this)
+overloadable void Bind(const DNATexture2D* this)
 {
     glBindTexture(GL_TEXTURE_2D, this->Id);
 }
 
-method char* ToString(const DNATexture2D* this)
+overloadable char* ToString(const DNATexture2D* this)
 {
     char* s = calloc(1024, 1);
     return s;

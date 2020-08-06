@@ -40,14 +40,8 @@ var SDL_RENDERER_ACCELERATED = 0x00000002
 /**
  * Internal Implementation 
  */
-foreign class GameImpl { 
+foreign class GameDelegate { 
     construct new(title, x, y, w, h, flags) {}
-    foreign Update()
-    foreign Render()
-    foreign Tick()
-    foreign Dispose()
-    foreign HandleEvents()
-    foreign Start()
     foreign Run()
 }
 
@@ -56,34 +50,19 @@ foreign class GameImpl {
  */
 class Game {
     construct new(title, x, y, w, h, flags) {
-        _impl = GameImpl.new(title, x, y, w, h, flags)
+        _delegate = GameDelegate.new(title, x, y, w, h, flags)
     }
 
-    Start() {
-        _impl.Start()
+    LoadContent() {
     }
 
     Update() {
-        _impl.Update()
     }
 
-    Render() {
-        _impl.Render()
+    Draw() {
     }
 
-    Tick() {
-        _impl.Tick()
+    Initialize() {
     }
 
-    Dispose() {
-        _impl.Dispose()
-    }
-
-    HandleEvents() {
-        _impl.HandleEvents()
-    }
-
-    Run() {
-        _impl.Run()
-    }
 }

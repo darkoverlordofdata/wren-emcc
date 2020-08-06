@@ -2,7 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <wren.h>
-#include <tglm/tglm.h>
+// #include <tglm/tglm.h>
+#include <dna.h>
 
 void math_vec3_allocate(WrenVM* vm) 
 { 
@@ -77,7 +78,6 @@ void math_vec3_length(WrenVM* vm)
 {
     float* data = wrenGetSlotForeign(vm, 0);
     Vec3 a = { data[0], data[1], data[2] };
-
     wrenSetSlotDouble(vm, 0, glm_length(a));
 }
 
@@ -95,7 +95,6 @@ void math_vec3_norm2(WrenVM* vm)
     Vec3 a = { data[0], data[1], data[2] };
 
     wrenSetSlotDouble(vm, 0, glm_norm2(a));
-
 }
 
 void math_vec3_normalize(WrenVM* vm)
@@ -107,6 +106,4 @@ void math_vec3_normalize(WrenVM* vm)
     data[0] = v.x;
     data[1] = v.y;
     data[2] = v.z;
-
 }
-

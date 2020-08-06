@@ -11,3 +11,5 @@ void math_mat_identity(WrenVM* vm);
 void math_mat_scale(WrenVM* vm);
 void math_mat_ortho(WrenVM* vm);
 void math_mat_rotate(WrenVM* vm);
+void math_mat_get(WrenVM* vm);
+void math_mat_set(WrenVM* vm);

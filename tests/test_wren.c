@@ -1,28 +1,27 @@
-#include <stdio.h>
-#include <cfw.h>
-#include <wren.h>
-#include <Block.h>
-#include "unit.h"
-#include "script.h"
 #include "builtins.h"
+#include "script.h"
+#include "unit.h"
+#include <Block.h>
+#include <cfw.h>
+#include <stdio.h>
+#include <wren.h>
 
 typedef const char* (^ICallStr)();
 typedef double (^ICallDbl)();
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-	CFWRefPool *pool = cfw_new(cfw_refpool);
+    CFWRefPool* pool = cfw_new(cfw_refpool);
 
     var s = NewScript((void*)&builtIns);
 
     switch (ExecuteModule(s, "test")) {
+
     case ResultSuccess:
         fputs("wrenInterpret(): ", stdout);
         fputs("Ok\n", stdout);
 
-
         Describe("Basic Tests", ^{
-
             It("return value is 'Hola Mundo'", ^{
                 ICallStr helloWorld = CallMethodStr(s, "test", "Main", "helloWorld()");
                 Expect(0 == strcmp(helloWorld(), "Hola Mundo"));
@@ -44,13 +43,14 @@ int main(int argc, char *argv[])
                 double r2 = vectors();
                 Expect(32 == (int)r2);
             });
-            
         });
         break;
+
     case ResultCompileError:
         fputs("wrenInterpret(): ", stdout);
         fputs("compile error\n", stdout);
         break;
+
     case ResultRuntimeError:
         fputs("wrenInterpret(): ", stdout);
         fputs("runtime error\n", stdout);
@@ -58,6 +58,5 @@ int main(int argc, char *argv[])
     }
 
     cfw_unref(pool);
-	exit(tests.failed);
-
+    exit(-1 | tests.failed);
 }

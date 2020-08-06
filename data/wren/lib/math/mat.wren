@@ -6,4 +6,6 @@ foreign class Mat {
   foreign ortho( left, right, bottom, top, nearVal, farVal)
   foreign rotate( angle, vec)
 
+  foreign [col, row]
+
 }

@@ -2,8 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <wren.h>
-#include <tglm/tglm.h>
-
+// #include <tglm/tglm.h>
+#include <dna.h>
 void math_vec2_allocate(WrenVM* vm) 
 { 
     float* data = (float*)wrenSetSlotNewForeign(vm, 0, 0, sizeof(float[2]));
@@ -81,7 +81,6 @@ void math_vec2_norm2(WrenVM* vm)
     Vec2 a = { data[0], data[1] };
 
     wrenSetSlotDouble(vm, 0, glm_norm2(a));
-
 }
 
 void math_vec2_normalize(WrenVM* vm)
@@ -92,6 +91,5 @@ void math_vec2_normalize(WrenVM* vm)
     v = glm_normalize(v);
     data[0] = v.x;
     data[1] = v.y;
-
 }
 

@@ -15,8 +15,11 @@ set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks" )
 # endif ()
 
 add_subdirectory ( libs/cfw )
+add_subdirectory ( libs/dna )
 
-add_executable( ${PROJECT_NAME} 
+
+
+add_executable( ${PROJECT_NAME}  #src/main.c ${SOURCE} )
     src/main.c 
     src/script.c 
     src/io/File.c
@@ -31,8 +34,10 @@ add_executable( ${PROJECT_NAME}
 
 include_directories( include )
 include_directories( libs/cfw/include )
+include_directories( libs/dna/include )
 include_directories( libs/wren/include )
 include_directories( external/stb )
+# include_directories( external/linmath.h )
  
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L${CMAKE_CURRENT_SOURCE_DIR}/libs" )
 

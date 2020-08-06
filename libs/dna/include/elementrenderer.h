@@ -11,14 +11,14 @@
 
 #include "rect.h"
 #include "texture2d.h"
-#include "tglm.h"
+#include "tglm/tglm.h"
 
 typedef struct DNAElementRenderer DNAElementRenderer;
 extern const CFWClass* DNAElementRendererClass;
 
-extern method void* New(DNAElementRenderer* this, DNAShader* shader);
+extern overloadable void* New(DNAElementRenderer* this, DNAShader* shader);
 
-extern method void Draw(DNAElementRenderer* this, DNATexture2D* texture, DNARect bounds, GLfloat rotate, Vec3 color);
+extern overloadable void Draw(DNAElementRenderer* this, DNATexture2D* texture, DNARect bounds, GLfloat rotate, Vec3 color);
 
-extern method void Draw(DNAElementRenderer* this, DNATexture2D* texture, Vec2 position, Vec2 size, GLfloat rotate, Vec3 color);
+extern overloadable void Draw(DNAElementRenderer* this, DNATexture2D* texture, Vec2 position, Vec2 size, GLfloat rotate, Vec3 color);
 

@@ -6,60 +6,60 @@
 #else
 #include <glad/glad.h>
 #endif
-#include "tglm.h"
+#include "tglm/tglm.h"
 #include <GLFW/glfw3.h>
 #include <corefw/class.h>
 
 typedef struct DNAShader DNAShader;
 extern const CFWClass* DNAShaderClass;
 
-extern method DNAShader* Use(DNAShader* this);
+extern overloadable DNAShader* Use(DNAShader* this);
 
-extern method void* New(DNAShader* this, CFWString* vShader, CFWString* fShader);
-extern method GLuint GetId(DNAShader* this);
-extern method void Compile(DNAShader* this, const GLchar* vertexSource, const GLchar* fragmentSource);
-extern method void SetFloat(
+extern overloadable void* New(DNAShader* this, CFWString* vShader, CFWString* fShader);
+extern overloadable GLuint GetId(DNAShader* this);
+extern overloadable void Compile(DNAShader* this, const GLchar* vertexSource, const GLchar* fragmentSource);
+extern overloadable void SetFloat(
     DNAShader* this,
     const GLchar* name,
     const GLfloat value,
     const GLboolean useShader);
 
-extern method void SetInteger(
+extern overloadable void SetInteger(
     DNAShader* this,
     const GLchar* name,
     GLint value,
     GLboolean useShader);
 
-extern method void SetInteger(
+extern overloadable void SetInteger(
     DNAShader* this,
     const GLchar* name,
     GLint value);
 
-extern method void SetVector2(
+extern overloadable void SetVector2(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
     GLfloat y,
     GLboolean useShader);
 
-extern method void SetVector2(
+extern overloadable void SetVector2(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
     GLfloat y);
 
-extern method void SetVector2v(
+extern overloadable void SetVector2v(
     DNAShader* this,
     const GLchar* name,
     const Vec2* vector,
     GLboolean useShader);
 
-extern method void SetVector2v(
+extern overloadable void SetVector2v(
     DNAShader* this,
     const GLchar* name,
     const Vec2* vector);
 
-extern method void SetVector3(
+extern overloadable void SetVector3(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -67,25 +67,25 @@ extern method void SetVector3(
     GLfloat z,
     GLboolean useShader);
 
-extern method void SetVector3(
+extern overloadable void SetVector3(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
     GLfloat y,
     GLfloat z);
 
-extern method void SetVector3v(
+extern overloadable void SetVector3v(
     DNAShader* this,
     const GLchar* name,
     const Vec3* vector,
     GLboolean useShader);
 
-extern method void SetVector3v(
+extern overloadable void SetVector3v(
     DNAShader* this,
     const GLchar* name,
     const Vec3* vector);
 
-extern method void SetVector4(
+extern overloadable void SetVector4(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -94,7 +94,7 @@ extern method void SetVector4(
     GLfloat w,
     GLboolean useShader);
 
-extern method void SetVector4(
+extern overloadable void SetVector4(
     DNAShader* this,
     const GLchar* name,
     GLfloat x,
@@ -102,24 +102,24 @@ extern method void SetVector4(
     GLfloat z,
     GLfloat w);
 
-extern method void SetVector4v(
+extern overloadable void SetVector4v(
     DNAShader* this,
     const GLchar* name,
     const Vec4* vector,
     GLboolean useShader);
 
-extern method void SetVector4v(
+extern overloadable void SetVector4v(
     DNAShader* this,
     const GLchar* name,
     const Vec4* vector);
 
-extern method void SetMatrix(
+extern overloadable void SetMatrix(
     DNAShader* this,
     const GLchar* name,
     const Mat* matrix,
     GLboolean useShader);
 
-extern method void SetMatrix(
+extern overloadable void SetMatrix(
     DNAShader* this,
     const GLchar* name,
     const Mat* matrix);

@@ -9,5 +9,5 @@
 #include "elementrenderer.h"
 #include "shader.h"
 #include "texture2d.h"
-#include "tglm.h"
+#include "tglm/tglm.h"
 // clang-format on

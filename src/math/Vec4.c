@@ -2,7 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <wren.h>
-#include <tglm/tglm.h>
+#include <dna.h>
+// #include <tglm/tglm.h>
 
 void math_vec4_allocate(WrenVM* vm) 
 { 
@@ -109,6 +110,5 @@ void math_vec4_norm2(WrenVM* vm)
     Vec4 a = { data[0], data[1], data[2] , data[3] };
 
     wrenSetSlotDouble(vm, 0, glm_norm2(a));
-
 }
 

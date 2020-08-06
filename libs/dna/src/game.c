@@ -82,7 +82,7 @@ static uint64_t GetTicks()
     return ((ts * 1000000L) + us) * 10;
 }
 
-method void* New(DNAGame* this, char* cstr, int width, int height, void* subclass, struct DNAGameVtbl* vptr)
+overloadable void* New(DNAGame* this, char* cstr, int width, int height, void* subclass, struct DNAGameVtbl* vptr)
 {
     this->subclass = subclass;
     this->override = vptr;
@@ -147,14 +147,14 @@ method void* New(DNAGame* this, char* cstr, int width, int height, void* subclas
     return this;
 }
 
-method char* ToString(DNAGame* this)
+overloadable char* ToString(DNAGame* this)
 {
     return this->title;
 }
 /**
  * DNAGame::Start
  */
-method void Start(DNAGame* const this)
+overloadable void Start(DNAGame* const this)
 {
     this->isRunning = true;
 }
@@ -162,7 +162,7 @@ method void Start(DNAGame* const this)
 /**
  * DNAGame::HandleEvents
  */
-method void HandleEvents(DNAGame* const this)
+overloadable void HandleEvents(DNAGame* const this)
 {
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(this->window, true);
@@ -203,7 +203,7 @@ method void HandleEvents(DNAGame* const this)
 /**
  * DNAGame::Tick
  */
-method void Tick(DNAGame* const this)
+overloadable void Tick(DNAGame* const this)
 {
     while (true) {
         // Advance the accumulated elapsed time.
@@ -295,7 +295,7 @@ method void Tick(DNAGame* const this)
 /**
  * DNAGame::RunLoop
  */
-method void RunLoop(DNAGame* const this)
+overloadable void RunLoop(DNAGame* const this)
 {
     HandleEvents(this);
     // if (this->keys[SDLK_ESCAPE]) {
@@ -307,7 +307,7 @@ method void RunLoop(DNAGame* const this)
 /**
  * DNAGame::Run
  */
-method void Run(DNAGame* const this)
+overloadable void Run(DNAGame* const this)
 {
     Initialize(this);
     LoadContent(this);
@@ -330,7 +330,7 @@ method void Run(DNAGame* const this)
 /**
  * DNAGame::Draw
  */
-method void Draw(DNAGame* const this)
+overloadable void Draw(DNAGame* const this)
 {
     this->override->Draw(this->subclass);
 }
@@ -338,7 +338,7 @@ method void Draw(DNAGame* const this)
 /**
  * DNAGame::LoadContent
  */
-method void LoadContent(DNAGame* const this)
+overloadable void LoadContent(DNAGame* const this)
 {
     this->override->LoadContent(this->subclass);
 }
@@ -346,7 +346,7 @@ method void LoadContent(DNAGame* const this)
 /**
  * DNAGame::Initialize
  */
-method void Initialize(DNAGame* const this)
+overloadable void Initialize(DNAGame* const this)
 {
     this->override->Initialize(this->subclass);
 }
@@ -354,7 +354,7 @@ method void Initialize(DNAGame* const this)
 /**
  * DNAGame::Update
  */
-method void Update(DNAGame* const this)
+overloadable void Update(DNAGame* const this)
 {
     this->override->Update(this->subclass);
 }

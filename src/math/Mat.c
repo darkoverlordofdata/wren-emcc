@@ -2,23 +2,39 @@
 #include <string.h>
 #include <unistd.h>
 #include <wren.h>
-#include <tglm/tglm.h>
+#include <dna.h>
 
 void math_mat_allocate(WrenVM* vm) 
 { 
-    float* data = (float*)wrenSetSlotNewForeign(vm, 0, 0, sizeof(float[16]));
+    float* data = wrenSetSlotNewForeign(vm, 0, 0, sizeof(float[16]));
     for (int i=0; i<16; i++) data[i] = 0;
 }
 
 void math_mat_finalize(void* data) { }
 
+void math_mat_get(WrenVM* vm)
+{
+    float* data = wrenGetSlotForeign(vm, 0);
+    int row = (int)wrenGetSlotDouble(vm, 1);
+    int col = (int)wrenGetSlotDouble(vm, 2);
+    wrenSetSlotDouble(vm, 0, data[row*4+col]);
+}
+
+void math_mat_set(WrenVM* vm)
+{
+    float* data = wrenGetSlotForeign(vm, 0);
+    int row = (int)wrenGetSlotDouble(vm, 1);
+    int col = (int)wrenGetSlotDouble(vm, 2);
+    data[row*4+col] = wrenGetSlotDouble(vm, 2);
+    wrenSetSlotDouble(vm, 0, data[row*4+col]);
+
+}
 
 void math_mat_identity(WrenVM* vm)
 {
     float* data = wrenGetSlotForeign(vm, 0);
     Mat m = mat_identity();
     for (int i=0; i<16; i++) data[i] = m[i];
-    
 }
 
 void math_mat_scale(WrenVM* vm)
@@ -62,7 +78,6 @@ void math_mat_rotate(WrenVM* vm)
 
     m = glm_rotate(m, angle, b);
     for (int i=0; i<16; i++) data[i] = m[i];
-
 }
 
 

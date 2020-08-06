@@ -25,51 +25,51 @@ struct DNAGameVtbl {
 
 // extern void* DNAGame_ctor(DNAGame* this, char* cstr, int width, int height, void* subclass, struct DNAGameVtbl* vptr);
 
-extern method void* New(DNAGame* this, char* cstr, int width, int height, void* subclass, struct DNAGameVtbl* vptr);
+extern overloadable void* New(DNAGame* this, char* cstr, int width, int height, void* subclass, struct DNAGameVtbl* vptr);
 
 /**
  * DNAGame::HandleEvents
  */
-extern method void HandleEvents(DNAGame* const this);
+extern overloadable void HandleEvents(DNAGame* const this);
 
-extern method char* ToString(DNAGame* this);
+extern overloadable char* ToString(DNAGame* this);
 
 /**
  * DNAGame::Start
  */
-extern method void Start(DNAGame* const this);
+extern overloadable void Start(DNAGame* const this);
 
 /**
  * DNAGame::Tick
  */
-extern method void Tick(DNAGame* const this);
+extern overloadable void Tick(DNAGame* const this);
 
 /**
  * DNAGame::RunLoop
  */
-extern method void RunLoop(DNAGame* const this);
+extern overloadable void RunLoop(DNAGame* const this);
 
 /**
  * DNAGame::Run
  */
-extern method void Run(DNAGame* const this);
+extern overloadable void Run(DNAGame* const this);
 
 /**
  * DNAGame::Initialize
  */
-extern method void Initialize(DNAGame* const this);
+extern overloadable void Initialize(DNAGame* const this);
 
 /**
  * DNAGame::LoadContent
  */
-extern method void LoadContent(DNAGame* const this);
+extern overloadable void LoadContent(DNAGame* const this);
 
 /**
  * DNAGame::Update
  */
-extern method void Update(DNAGame* const this);
+extern overloadable void Update(DNAGame* const this);
 
 /**
  * DNAGame::Draw
  */
-extern method void Draw(DNAGame* const this);
+extern overloadable void Draw(DNAGame* const this);

@@ -1,7 +1,7 @@
 set(SOURCE
    ${SOURCE}
    ${CMAKE_CURRENT_SOURCE_DIR}/src/glad.c
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/tglm.c
+   # ${CMAKE_CURRENT_SOURCE_DIR}/src/tglm.c
    ${CMAKE_CURRENT_SOURCE_DIR}/src/game.c
    ${CMAKE_CURRENT_SOURCE_DIR}/src/shader.c
    ${CMAKE_CURRENT_SOURCE_DIR}/src/texture2d.c

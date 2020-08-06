@@ -67,7 +67,7 @@ void Init(DNAResourceManager* this)
     this->Shaders = cfw_new(cfw_map, NULL);
     this->Textures = cfw_new(cfw_map, NULL);
 }
-method void* New(DNAResourceManager* this)
+overloadable void* New(DNAResourceManager* this)
 {
     Init(this);
     return this;
@@ -80,7 +80,7 @@ method void* New(DNAResourceManager* this)
  * @param name to cache as
  * @returns loaded, compiled and linked shader program
  */
-method DNAShader* LoadShader(
+overloadable DNAShader* LoadShader(
     const DNAResourceManager* this,
     const GLchar* vShaderFile,
     const GLchar* fShaderFile,
@@ -99,7 +99,7 @@ method DNAShader* LoadShader(
  * @returns loaded, compiled and linked shader program
  * 
  */
-method DNAShader* GetShader(
+overloadable DNAShader* GetShader(
     const DNAResourceManager* this,
     const char* name)
 {
@@ -115,7 +115,7 @@ method DNAShader* GetShader(
  * @returns Texture
  * 
  */
-method DNATexture2D* LoadTexture(
+overloadable DNATexture2D* LoadTexture(
     const DNAResourceManager* this,
     const GLchar* file,
     GLboolean alpha,
@@ -132,7 +132,7 @@ method DNATexture2D* LoadTexture(
  * @returns Texture
  * 
  */
-method DNATexture2D* GetTexture(
+overloadable DNATexture2D* GetTexture(
     const DNAResourceManager* this,
     const char* name)
 {

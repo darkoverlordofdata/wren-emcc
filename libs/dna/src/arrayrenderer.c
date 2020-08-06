@@ -32,7 +32,7 @@ static void dtor(void* self)
     glDeleteBuffers(1, &this->VBO);
 }
 
-method void* New(DNAArrayRenderer* this, DNAShader* shader)
+overloadable void* New(DNAArrayRenderer* this, DNAShader* shader)
 {
     this->shader = shader;
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -72,7 +72,7 @@ method void* New(DNAArrayRenderer* this, DNAShader* shader)
  * @param color to tint
  * 
  */
-method void Draw(
+overloadable void Draw(
     DNAArrayRenderer* this,
     DNATexture2D* texture,
     DNARect* bounds,
@@ -120,7 +120,7 @@ method void Draw(
  * @param color to tint
  * 
  */
-method void Draw(
+overloadable void Draw(
     DNAArrayRenderer* this,
     DNATexture2D* texture,
     Vec2 position, 
