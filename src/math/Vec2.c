@@ -2,8 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <wren.h>
-// #include <tglm/tglm.h>
 #include <dna.h>
+
 void math_vec2_allocate(WrenVM* vm) 
 { 
     float* data = (float*)wrenSetSlotNewForeign(vm, 0, 0, sizeof(float[2]));

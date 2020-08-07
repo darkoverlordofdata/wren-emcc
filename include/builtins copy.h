@@ -10,7 +10,7 @@
  * native builtin class bindings
  */
 const static WrenScript builtIns[] = {
-    { "io", "Path", io_path_Allocate, io_path_Finalize,
+    { "lib/io/path", "Path", io_path_Allocate, io_path_Finalize,
         {
             { "+Absolute", io_path_Absolute },
             { "+Relative", io_path_Relative },
@@ -25,17 +25,15 @@ const static WrenScript builtIns[] = {
             { "Normalize()", io_path_Normalize },
             { "ToString()", io_path_ToString },
         } },
-    { "io", "Stream", io_stream_Allocate, io_stream_Finalize,
+    { "lib/io/stream", "Stream", io_stream_Allocate, io_stream_Finalize,
         {
             { "Write(_)", io_stream_Write },
             { "Read()", io_stream_Read },
             { "Close()", io_stream_Close },
         } },
-    { "io", "File", io_file_Allocate, io_file_Finalize,
-        {
-            
-        } },
-    { "math", "Vec2", math_vec2_allocate, math_vec2_finalize,
+    { "lib/io/file", "File", io_file_Allocate, io_file_Finalize,
+        {} },
+    { "lib/math/vec2", "Vec2", math_vec2_allocate, math_vec2_finalize,
         {
             { "x", math_vec2_get_x },
             { "x=(_)", math_vec2_set_x },
@@ -48,7 +46,7 @@ const static WrenScript builtIns[] = {
             { "norm2()", math_vec2_norm2 },
             { "normalize()", math_vec2_normalize },
         } },
-    { "math", "Vec3", math_vec3_allocate, math_vec3_finalize,
+    { "lib/math/vec3", "Vec3", math_vec3_allocate, math_vec3_finalize,
         {
             { "x", math_vec3_get_x },
             { "x=(_)", math_vec3_set_x },
@@ -63,7 +61,7 @@ const static WrenScript builtIns[] = {
             { "norm2()", math_vec3_norm2 },
             { "normalize()", math_vec3_normalize },
         } },
-    { "math", "Vec4", math_vec4_allocate, math_vec4_finalize,
+    { "lib/math/vec4", "Vec4", math_vec4_allocate, math_vec4_finalize,
         {
             { "x", math_vec4_get_x },
             { "x=(_)", math_vec4_set_x },
@@ -75,11 +73,11 @@ const static WrenScript builtIns[] = {
             { "w=(_)", math_vec4_set_w },
             { "norm()", math_vec4_norm },
             { "dot(_)", math_vec4_dot },
-            { "clamp(_,_)", math_vec4_clamp },
             { "length()", math_vec4_length },
             { "norm2()", math_vec4_norm2 },
+            { "clamp()", math_vec4_clamp },
         } },
-    { "math", "Mat", math_mat_allocate, math_mat_finalize,
+    { "lib/math/mat", "Mat", math_mat_allocate, math_mat_finalize,
         {
             { "identity()", math_mat_identity },
             { "scale(_)", math_mat_scale },
@@ -88,7 +86,7 @@ const static WrenScript builtIns[] = {
             { "[_,_]", math_mat_get },
             { "[_,_]=(_)", math_mat_set }
         } },
-    // "game", "GameDelegate", dna_game_Allocate, dna_game_Finalize,
+    // "lib/dna/game", "GameDelegate", dna_game_Allocate, dna_game_Finalize,
     // {
     //     { "DoUpdate()", dna_game_DoUpdate },
     //     { "DoDraw()", dna_game_DoDraw },

@@ -58,5 +58,5 @@ int main(int argc, char* argv[])
     }
 
     cfw_unref(pool);
-    exit(-1 | tests.failed);
+    exit(tests.failed);
 }

@@ -2,7 +2,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <wren.h>
-// #include <tglm/tglm.h>
 #include <dna.h>
 
 void math_vec3_allocate(WrenVM* vm) 
