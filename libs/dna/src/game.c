@@ -26,7 +26,7 @@
 /**
  *  class DNAGame
  */
-corefw(DNAGame);
+class(DNAGame);
 
 static bool ctor(void* self, va_list args) { return true; }
 static bool equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }

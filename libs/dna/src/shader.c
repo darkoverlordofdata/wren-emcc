@@ -13,7 +13,7 @@
 #include "shader-private.h"
 #include <GLFW/glfw3.h>
 
-corefw(DNAShader);
+class(DNAShader);
 static bool ctor(void* self, va_list args) { return true; }
 static bool equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
 static uint32_t hash(void* self) { return (uint32_t)self; }

@@ -66,7 +66,7 @@ static inline void init_by_array(CFWRandom* this, unsigned long init_key[], int 
 static inline unsigned long genrand_int32(CFWRandom* this);
 static inline double genrand_real1(CFWRandom* this);
 
-corefw(CFWRandom);
+class(CFWRandom);
 static bool ctor(void* self, va_list args) { return true; }
 static bool equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
 static uint32_t hash(void* self) { return (uint32_t)self; }

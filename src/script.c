@@ -1,9 +1,9 @@
 #include "script.h"
+#include <Block.h>
 #include <cfw.h>
 #include <stdio.h>
 #include <string.h>
 #include <wren.h>
-#include <Block.h>
 /**
  * WrenVM interface
  */
@@ -27,18 +27,37 @@ static void dtor(void* self)
     printf("BYE!!!\n");
     wrenFreeVM(this->vm);
 }
-const static CFWClass class = { 
-    .name = "Script", 
-    .size = sizeof(Script), 
-    .ctor = ctor, 
-    .dtor = dtor, 
-    .equal = equal, 
-    .hash = hash, 
+const static CFWClass class = {
+    .name = "Script",
+    .size = sizeof(Script),
+    .ctor = ctor,
+    .dtor = dtor,
+    .equal = equal,
+    .hash = hash,
     .copy = copy,
-}; 
+};
 
 const CFWClass* ScriptClass = &class;
 
+void* New(Script* this, void* builtIns)
+{
+    WrenConfiguration config = {
+        .reallocateFn = realloc,
+        .resolveModuleFn = VMResolveModule,
+        .loadModuleFn = VMLoadModule,
+        .bindForeignClassFn = VMRegisterForeignClass,
+        .bindForeignMethodFn = VMRegisterForeignMethod,
+        .writeFn = VMLog,
+        .errorFn = VMError,
+        .initialHeapSize = 1024 * 1024 * 10,
+        .minHeapSize = 1024 * 1024,
+        .heapGrowthPercent = 50,
+        .userData = builtIns
+    };
+
+    this->vm = wrenNewVM(&config);
+    return this;
+}
 /**
  * Create new instance of Wren VM
  * 
@@ -94,12 +113,12 @@ Result ExecuteString(Script* this, char* code)
 Result ExecuteModule(Script* this, char* name)
 {
     var code = VMLoadModule(this->vm, name);
-    var res = wrenInterpret(this->vm, name, code);
+    var result = wrenInterpret(this->vm, name, code);
 
-    if (res == WREN_RESULT_COMPILE_ERROR) {
+    if (result == WREN_RESULT_COMPILE_ERROR) {
         return ResultCompileError;
     }
-    if (res == WREN_RESULT_RUNTIME_ERROR) {
+    if (result == WREN_RESULT_RUNTIME_ERROR) {
         return ResultRuntimeError;
     }
     return ResultSuccess;
@@ -118,12 +137,20 @@ void* CallMethodStr(Script* this, const char* module, const char* variable, cons
 {
     wrenEnsureSlots(this->vm, 1);
     wrenGetVariable(this->vm, module, variable, 0);
-    __block WrenHandle* handle = wrenGetSlotHandle(this->vm, 0); 
+    __block WrenHandle* handle = wrenGetSlotHandle(this->vm, 0);
     __block WrenHandle* method = wrenMakeCallHandle(this->vm, signature);
 
     return Block_copy(^() {
+        // call cached method 
         wrenSetSlotHandle(this->vm, 0, handle);
         wrenCall(this->vm, method);
+        // get return value
+        var t = wrenGetSlotType(this->vm, 0);
+        if (t != WREN_TYPE_STRING) {
+            wrenSetSlotString(this->vm, 0, "Invalid String Value");
+            wrenAbortFiber(this->vm, 0);
+            return (const char*)0;
+        }
         const char* value = wrenGetSlotString(this->vm, 0);
         return value;
     });
@@ -138,16 +165,22 @@ void* CallMethodStr(Script* this, const char* module, const char* variable, cons
  * @param name method signature
  * @returns a function that calls the vm returning a double
  */
-void* CallMethodDbl(Script* this, const char* module, const char* variable, const char* signature)
+void* CallMethodNum(Script* this, const char* module, const char* variable, const char* signature)
 {
     wrenEnsureSlots(this->vm, 1);
     wrenGetVariable(this->vm, module, variable, 0);
-    __block WrenHandle* handle = wrenGetSlotHandle(this->vm, 0); 
+    __block WrenHandle* handle = wrenGetSlotHandle(this->vm, 0);
     __block WrenHandle* method = wrenMakeCallHandle(this->vm, signature);
 
     return Block_copy(^() {
         wrenSetSlotHandle(this->vm, 0, handle);
         wrenCall(this->vm, method);
+        var t = wrenGetSlotType(this->vm, 0);
+        if (t != WREN_TYPE_NUM) {
+            wrenSetSlotString(this->vm, 0, "Invalid Number Value");
+            wrenAbortFiber(this->vm, 0);
+            return (double)0;
+        }
         double value = wrenGetSlotDouble(this->vm, 0);
         return value;
     });
@@ -301,4 +334,3 @@ WrenForeignMethodFn VMRegisterForeignMethod(WrenVM* vm,
     }
     return NULL;
 }
-

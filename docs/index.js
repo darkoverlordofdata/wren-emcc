@@ -118,9 +118,6 @@ var Module = typeof Module !== 'undefined' ? Module : {};
       }
   Module['FS_createPath']('/', 'data', true, true);
 Module['FS_createPath']('/data', 'wren', true, true);
-Module['FS_createPath']('/data/wren', 'lib', true, true);
-Module['FS_createPath']('/data/wren/lib', 'io', true, true);
-Module['FS_createPath']('/data/wren/lib', 'math', true, true);
 
       /** @constructor */
       function DataRequest(start, end, audio) {
@@ -203,7 +200,7 @@ Module['FS_createPath']('/data/wren/lib', 'math', true, true);
     }
   
    }
-   loadPackage({"files": [{"filename": "/data/wren/main.wren", "start": 0, "end": 788, "audio": 0}, {"filename": "/data/wren/test.wren", "start": 788, "end": 1487, "audio": 0}, {"filename": "/data/wren/lib/io/file.wren", "start": 1487, "end": 3384, "audio": 0}, {"filename": "/data/wren/lib/io/path.wren", "start": 3384, "end": 4648, "audio": 0}, {"filename": "/data/wren/lib/io/stream.wren", "start": 4648, "end": 4767, "audio": 0}, {"filename": "/data/wren/lib/math/vec2.wren", "start": 4767, "end": 5017, "audio": 0}, {"filename": "/data/wren/lib/math/vec3.wren", "start": 5017, "end": 5302, "audio": 0}, {"filename": "/data/wren/lib/math/vec4.wren", "start": 5302, "end": 5600, "audio": 0}, {"filename": "/readme.md", "start": 5600, "end": 6005, "audio": 0}], "remote_package_size": 6005, "package_uuid": "81793e31-d2f9-4152-8298-0188e5d48fab"});
+   loadPackage({"files": [{"filename": "/data/wren/main.wren", "start": 0, "end": 788, "audio": 0}, {"filename": "/data/wren/test.wren", "start": 788, "end": 1895, "audio": 0}, {"filename": "/data/wren/io.wren", "start": 1895, "end": 5175, "audio": 0}, {"filename": "/data/wren/math.wren", "start": 5175, "end": 6322, "audio": 0}, {"filename": "/readme.md", "start": 6322, "end": 7518, "audio": 0}], "remote_package_size": 7518, "package_uuid": "254e1b5c-ad6c-4493-af3c-1ff1975e9801"});
   
   })();
   
@@ -866,8 +863,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 331,
-  'maximum': 331 + 0,
+  'initial': 339,
+  'maximum': 339 + 0,
   'element': 'anyfunc'
 });
 
@@ -1486,11 +1483,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5277504,
+    STACK_BASE = 5277712,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 34624,
-    DYNAMIC_BASE = 5277504,
-    DYNAMICTOP_PTR = 34464;
+    STACK_MAX = 34832,
+    DYNAMIC_BASE = 5277712,
+    DYNAMICTOP_PTR = 34672;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -2052,7 +2049,7 @@ var ASM_CONSTS = {
 
 
 
-// STATICTOP = STATIC_BASE + 33600;
+// STATICTOP = STATIC_BASE + 33808;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -6542,7 +6539,7 @@ var ASM_CONSTS = {
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 34464;
+      return 34672;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {

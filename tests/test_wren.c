@@ -7,13 +7,13 @@
 #include <wren.h>
 
 typedef const char* (^ICallStr)();
-typedef double (^ICallDbl)();
+typedef double (^ICallNum)();
 
 int main(int argc, char* argv[])
 {
     CFWRefPool* pool = cfw_new(cfw_refpool);
 
-    var s = NewScript((void*)&builtIns);
+    var s = new (Script, (void*)&builtIns);
 
     switch (ExecuteModule(s, "test")) {
 
@@ -33,13 +33,13 @@ int main(int argc, char* argv[])
             });
 
             It("x is 3", ^{
-                ICallDbl vectorx = CallMethodDbl(s, "test", "test", "vectorx()");
+                ICallNum vectorx = CallMethodNum(s, "test", "test", "vectorx()");
                 double r1 = vectorx();
                 Expect(3 == (int)r1);
             });
 
             It("return value is 32", ^{
-                ICallDbl vectors = CallMethodDbl(s, "test", "test", "vectors()");
+                ICallNum vectors = CallMethodNum(s, "test", "test", "vectors()");
                 double r2 = vectors();
                 Expect(32 == (int)r2);
             });
@@ -58,5 +58,5 @@ int main(int argc, char* argv[])
     }
 
     cfw_unref(pool);
-    exit(tests.failed);
+    exit(-1 | tests.failed);
 }

@@ -66,21 +66,11 @@
  */
 #define join(...) strnjoin(PP_NARG(__VA_ARGS__), __VA_ARGS__)
 
-#define CFWArrayClass cfw_array
-#define CFWBoolClass cfw_bool
-#define CFWDoubleClass cfw_double
-#define CFWFileClass cfw_file
-#define CFWIntClass cfw_int
-#define CFWMapClass cfw_map
-#define CFWRangeClass cfw_range
-#define CFWStreamClass cfw_stream
-#define CFWStringClass cfw_string
-
 /**
  *  MACRO new
  *      Create a new CoreFW object from the current memory pool
  */
-#define new(T, args...) (T*)New((T*)cfw_create((CFWClass*)T##Class), ## args)
+#define new(T, args...) New((T*)cfw_create((CFWClass*)T##Class), ## args)
 
 /**
  * MACRO class
@@ -104,7 +94,6 @@
     };                                  \
     const CFWClass* T##Class = &class
 
-
 #include "cfwfs.h"
 #include "bitvector.h"
 #include "random.h"
@@ -124,17 +113,8 @@ extern overloadable int Length(CFWArray* this);
 extern overloadable int Length(CFWString* this);
 extern overloadable char* cstr(CFWString* this);
 extern overloadable char* ToString(CFWString* this);
-
 extern overloadable void* New(CFWString* this);
-extern overloadable void* New(CFWString* this, const char* value);
-extern overloadable void* New(CFWMap* this);
-extern overloadable void* New(CFWArray* this);
-extern overloadable void* New(CFWDouble* this, double value);
-extern overloadable void* New(CFWInt* this, int value);
-extern overloadable void* New(CFWFile* this, char* path, char* mode);
-extern overloadable void* New(CFWStream* this, char* path, char* mode);
-extern overloadable void* New(CFWBool* this, bool value);
+extern overloadable void* New(CFWString* this, char* value);
 
 static inline struct CFWObject* asObject(void* obj) { return obj; }
 char* strnjoin(int count, ...);
-

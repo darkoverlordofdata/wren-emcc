@@ -22,11 +22,47 @@ overloadable void Clear(CFWArray* this)
 
 overloadable void* New(CFWString* this)
 {
-    return cfw_new(cfw_string, NULL);
+    return cfw_create(cfw_string, NULL);
 }
-overloadable void* New(CFWString* this, char* value)
+
+overloadable void* New(CFWString* this, const char* value)
 {
-    return cfw_new(cfw_string, value);    
+    return cfw_create(cfw_string, value);    
+}
+
+overloadable void* New(CFWBool* this, bool value)
+{
+    return cfw_create(cfw_bool, value);    
+}
+
+overloadable void* New(CFWInt* this, int value)
+{
+    return cfw_create(cfw_int, value);    
+}
+
+overloadable void* New(CFWDouble* this, double value)
+{
+    return cfw_create(cfw_double, value);    
+}
+
+overloadable void* New(CFWFile* this, char* path, char* mode)
+{
+    return cfw_create(cfw_file, path, mode);    
+}
+
+overloadable void* New(CFWStream* this, char* path, char* mode)
+{
+    return cfw_create(cfw_stream, path, mode);    
+}
+
+overloadable void* New(CFWMap* this)
+{
+    return cfw_create(cfw_map, NULL);    
+}
+
+overloadable void* New(CFWArray* this)
+{
+    return cfw_create(cfw_array, NULL);    
 }
 
 overloadable void* Get(CFWArray* this, int i)
@@ -59,7 +95,6 @@ overloadable void Put(CFWArray* this, int index, void* object)
     cfw_array_set(this, index, object);
 }
 
-// overloadable void ForEach(CFWMap* this, void(*func)(void* item))
 overloadable void ForEach(CFWMap* this, void(*func)(void* key, void* item))
 {
    cfw_map_iter_t iter;
@@ -102,13 +137,17 @@ overloadable int Length(CFWString* this)
 }
 
 /**
- * join strings
+ * strnjoin
  * 
  * @param count of strings
  * @param ... list of char*'s
  * @returns all strings concantenated together.
+ *
+ * call as: 
+ *  strnjoin(PP_NARG(__VA_ARGS__), __VA_ARGS__)
+ *
  */
-char* STR_JOIN(int count, ...)
+char* strnjoin(int count, ...)
 {
     
     int size = 0;

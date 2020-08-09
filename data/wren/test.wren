@@ -39,11 +39,19 @@ class Main {
 
 var test = Main.new()
 
-// var z = Mat.new()
-// z.identity()
-// System.print("%(z[0, 0]) %(z[0, 1]) %(z[0, 2]) %(z[0, 3])")
-// System.print("%(z[1, 0]) %(z[1, 1]) %(z[1, 2]) %(z[1, 3])")
-// System.print("%(z[2, 0]) %(z[2, 1]) %(z[2, 2]) %(z[2, 3])")
-// System.print("%(z[3, 0]) %(z[3, 1]) %(z[3, 2]) %(z[3, 3])")
+var z = Mat.new()
+z.identity()
+System.print("%(z[0, 0]) %(z[0, 1]) %(z[0, 2]) %(z[0, 3])")
+System.print("%(z[1, 0]) %(z[1, 1]) %(z[1, 2]) %(z[1, 3])")
+System.print("%(z[2, 0]) %(z[2, 1]) %(z[2, 2]) %(z[2, 3])")
+System.print("%(z[3, 0]) %(z[3, 1]) %(z[3, 2]) %(z[3, 3])")
 
 
+var fiber = Fiber.new {|param|
+  System.print(param)
+  var result = Fiber.yield()
+  System.print(result)
+}
+
+fiber.call("First") //> First
+fiber.call("Second") //> Second
