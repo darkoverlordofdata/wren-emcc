@@ -90,7 +90,17 @@ var fiber = Fiber.new {|param|
 
 fiber.call("First") //> First
 fiber.call("Second") //> Second
-class File {
+
+class Counter {
+  static create() {
+    var i = 0
+    return Fn.new { i = i + 1 }
+  }
+}
+var counter = Counter.create()
+System.print(counter.call()) //> 1
+System.print(counter.call()) //> 2
+System.print(counter.call()) //> 3class File {
     /**
      * The system-dependent path-separator character.
      * On UNIX systems the value of this

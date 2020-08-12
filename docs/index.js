@@ -200,7 +200,7 @@ Module['FS_createPath']('/data', 'wren', true, true);
     }
   
    }
-   loadPackage({"files": [{"filename": "/data/wren/main.wren", "start": 0, "end": 788, "audio": 0}, {"filename": "/data/wren/test.wren", "start": 788, "end": 1895, "audio": 0}, {"filename": "/data/wren/io.wren", "start": 1895, "end": 5175, "audio": 0}, {"filename": "/data/wren/math.wren", "start": 5175, "end": 6322, "audio": 0}, {"filename": "/readme.md", "start": 6322, "end": 7518, "audio": 0}], "remote_package_size": 7518, "package_uuid": "254e1b5c-ad6c-4493-af3c-1ff1975e9801"});
+   loadPackage({"files": [{"filename": "/data/wren/main.wren", "start": 0, "end": 788, "audio": 0}, {"filename": "/data/wren/test.wren", "start": 788, "end": 2119, "audio": 0}, {"filename": "/data/wren/io.wren", "start": 2119, "end": 5399, "audio": 0}, {"filename": "/data/wren/math.wren", "start": 5399, "end": 6546, "audio": 0}, {"filename": "/readme.md", "start": 6546, "end": 7742, "audio": 0}], "remote_package_size": 7742, "package_uuid": "8ecf7267-782e-4043-8d53-db30ecd6da3e"});
   
   })();
   

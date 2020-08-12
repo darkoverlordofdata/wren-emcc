@@ -5,7 +5,10 @@ int main(int argc, char* argv[])
 {
     CFWRefPool* pool = cfw_new(cfw_refpool);
 
-    var fred = new (CFWString, "Fred");
+    CFWString* fred = cfw_create(CFWStringClass, "Fred");   
+
+    // var fred = new_(CFWString, "Fred");
+    var freda = new_(CFWString, "Freda");
 
     char* str = join("this", " ", "is", " ", "a", " ", "test");
 
@@ -19,7 +22,12 @@ int main(int argc, char* argv[])
         });
 
         It("creates a string equal to 'Fred'", ^{
-            Expect(0 == cfw_string_find_c(fred, "Fred", cfw_range_all));
+            Expect(0 == cfw_string_find_c(fred, "Fred", cfw_range(0, 4)));
+            // Expect(0 == cfw_string_find_c(fred, "Fred", cfw_range_all));
+        });
+
+        It("creates a string equal to freda", ^{
+            Expect(0 == cfw_string_find(fred, freda, cfw_range_all));
         });
     });
 

@@ -4,7 +4,7 @@ project(demo VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -std=c18 -O3" )
+set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -std=c11 -O0 -g" )
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks" )
 
 #

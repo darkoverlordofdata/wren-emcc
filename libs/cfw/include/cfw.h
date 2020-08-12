@@ -82,6 +82,10 @@
  */
 #define new(T, args...) (T*)New((T*)cfw_create((CFWClass*)T##Class), ## args)
 
+    // var fred = (CFWString*)cfw_create(CFWStringClass, "Fred");
+
+// #define new_(T, args...)(T*)cfw_create((CFWClass*)T##Class, ## args)
+#define new_(T, args...)(T*)cfw_create((CFWClass*)T##Class, ## args)
 /**
  * MACRO class
  *      generate typeinfo boilerplate for corefw

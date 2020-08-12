@@ -53,5 +53,16 @@ var fiber = Fiber.new {|param|
   System.print(result)
 }
 
-fiber.call("First") //> First
-fiber.call("Second") //> Second
+fiber.call("First")
+fiber.call("Second")
+
+class Counter {
+  static create() {
+    var i = 0
+    return Fn.new { i = i + 1 }
+  }
+}
+var counter = Counter.create()
+System.print(counter.call()) //> 1
+System.print(counter.call()) //> 2
+System.print(counter.call()) //> 3
