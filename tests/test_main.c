@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
     CFWString* fred = cfw_create(CFWStringClass, "Fred");   
 
     // var fred = new_(CFWString, "Fred");
-    var freda = new_(CFWString, "Freda");
+    var freda = new_(CFWString, "Fred");
 
     char* str = join("this", " ", "is", " ", "a", " ", "test");
 
