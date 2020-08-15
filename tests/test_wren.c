@@ -1,62 +1,46 @@
-#include "builtins.h"
-#include "script.h"
-#include "unit.h"
-#include <Block.h>
 #include <cfw.h>
 #include <stdio.h>
 #include <wren.h>
+#include "builtins.h"
+#include "script.h"
+#include "method.h"
+#include "unity/unity.h"
 
-typedef const char* (^ICallStr)();
-typedef double (^ICallNum)();
+CFWRefPool* pool;
+WCScript* script;
+WCMethod* hello_world;
+WCMethod* vectorx;
 
-int main(int argc, char* argv[])
+void setUp(void) 
 {
-    CFWRefPool* pool = cfw_new(cfw_refpool);
+    pool = cfw_new(cfw_refpool);
+    script = cfw_create(wc_script, &builtIns);
+    wc_execute_module(script, "test");
+    hello_world = cfw_create(wc_method, script, "test", "Main", "helloWorld()");
+    vectorx = cfw_create(wc_method, script, "test", "test", "vectorx()");
+}    
 
-    var s = new (Script, (void*)&builtIns);
-
-    switch (ExecuteModule(s, "test")) {
-
-    case ResultSuccess:
-        fputs("wrenInterpret(): ", stdout);
-        fputs("Ok\n", stdout);
-
-        Describe("Basic Tests", ^{
-            It("return value is 'Hola Mundo'", ^{
-                ICallStr helloWorld = CallMethodStr(s, "test", "Main", "helloWorld()");
-                Expect(0 == strcmp(helloWorld(), "Hola Mundo"));
-            });
-
-            It("return value is 'Hello World'", ^{
-                ICallStr testly = CallMethodStr(s, "test", "test", "testly()");
-                Expect(0 == strcmp(testly(), "Hello World"));
-            });
-
-            It("x is 3", ^{
-                ICallNum vectorx = CallMethodNum(s, "test", "test", "vectorx()");
-                double r1 = vectorx();
-                Expect(3 == (int)r1);
-            });
-
-            It("return value is 32", ^{
-                ICallNum vectors = CallMethodNum(s, "test", "test", "vectors()");
-                double r2 = vectors();
-                Expect(32 == (int)r2);
-            });
-        });
-        break;
-
-    case ResultCompileError:
-        fputs("wrenInterpret(): ", stdout);
-        fputs("compile error\n", stdout);
-        break;
-
-    case ResultRuntimeError:
-        fputs("wrenInterpret(): ", stdout);
-        fputs("runtime error\n", stdout);
-        break;
-    }
-
+void tearDown(void) 
+{ 
     cfw_unref(pool);
-    exit(tests.failed);
 }
+
+void test_method_num_is_3(void)
+{
+    TEST_ASSERT_EQUAL_UINT32(3, wc_method_num(vectorx));
+}
+
+void test_method_str_is_hola_mundo(void)
+{
+    TEST_ASSERT_EQUAL_STRING("Hola Mundo", wc_method_str(hello_world));
+}
+
+
+int main(void)
+{
+    UNITY_BEGIN();
+    RUN_TEST(test_method_num_is_3);
+    RUN_TEST(test_method_str_is_hola_mundo);
+    return UNITY_END();
+}
+

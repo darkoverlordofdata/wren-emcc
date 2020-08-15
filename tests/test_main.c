@@ -1,37 +1,52 @@
 #include "cfw.h"
-#include "unit.h"
+#include "unity/unity.h"
 
-int main(int argc, char* argv[])
+CFWRefPool* pool;
+CFWString* fred;
+CFWString* freda;
+char* str;
+
+void setUp(void)
 {
-    CFWRefPool* pool = cfw_new(cfw_refpool);
+    pool = cfw_new(cfw_refpool);
+    fred = cfw_create(cfw_string, "Fred");
+    freda = cfw_create(cfw_string, "Fred");
+    str = join("this", " ", "is", " ", "a", " ", "test");
+}
 
-    CFWString* fred = cfw_create(CFWStringClass, "Fred");   
-
-    // var fred = new_(CFWString, "Fred");
-    var freda = new_(CFWString, "Fred");
-
-    char* str = join("this", " ", "is", " ", "a", " ", "test");
-
-    Describe("Basic Tests", ^{
-        It("string length is 14", ^{
-            Expect(strlen(str) == 14);
-        });
-
-        It("value is 'this is a test'", ^{
-            Expect(0 == strcmp("this is a test", str));
-        });
-
-        It("creates a string equal to 'Fred'", ^{
-            Expect(0 == cfw_string_find_c(fred, "Fred", cfw_range(0, 4)));
-            // Expect(0 == cfw_string_find_c(fred, "Fred", cfw_range_all));
-        });
-
-        It("creates a string equal to freda", ^{
-            Expect(0 == cfw_string_find(fred, freda, cfw_range_all));
-        });
-    });
-
+void tearDown(void)
+{
     free(str);
     cfw_unref(pool);
-    exit(tests.failed);
 }
+
+void test_length_is_14(void)
+{
+    TEST_ASSERT_EQUAL_UINT32(14, strlen(str));
+}
+
+void test_is_this_is_a_test(void)
+{
+    TEST_ASSERT_EQUAL_STRING("this is a test",str);
+}
+
+void test_is_equal_to_Fred(void)
+{
+    TEST_ASSERT_EQUAL_STRING("Fred", cfw_string_c(fred));
+}
+
+void test_is_equal_to_freda(void)
+{
+    TEST_ASSERT_EQUAL_UINT32(0, cfw_string_find(fred, freda, cfw_range_all));
+}
+
+int main(void)
+{
+    UNITY_BEGIN();
+    RUN_TEST(test_length_is_14);
+    RUN_TEST(test_is_this_is_a_test);
+    RUN_TEST(test_is_equal_to_Fred);
+    RUN_TEST(test_is_equal_to_freda);
+    return UNITY_END();
+}
+

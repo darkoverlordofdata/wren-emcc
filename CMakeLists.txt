@@ -22,6 +22,7 @@ add_subdirectory ( libs/dna )
 add_executable( ${PROJECT_NAME}  #src/main.c ${SOURCE} )
     src/main.c 
     src/script.c 
+    src/method.c 
     src/io/File.c
     src/io/Path.c
     src/io/Stream.c

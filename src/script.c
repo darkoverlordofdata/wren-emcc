@@ -7,29 +7,49 @@
 /**
  * WrenVM interface
  */
-void VMLog(WrenVM* vm, const char* text);
-void VMError(WrenVM* vm, WrenErrorType type, const char* module, int line, const char* message);
-const char* VMResolveModule(WrenVM* vm, const char* importer, const char* name);
-char* VMLoadModule(WrenVM* vm, const char* moduleName);
-WrenForeignClassMethods VMRegisterForeignClass(WrenVM* vm, const char* module, const char* className);
-WrenForeignMethodFn VMRegisterForeignMethod(WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature);
+void vm_log(WrenVM* vm, const char* text);
+void vm_error(WrenVM* vm, WrenErrorType type, const char* module, int line, const char* message);
+const char* vm_resolve_module(WrenVM* vm, const char* importer, const char* name);
+char* vm_load_module(WrenVM* vm, const char* moduleName);
+WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm, const char* module, const char* className);
+WrenForeignMethodFn vm_register_foreign_method(WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature);
 
 /**
- * CFWObject interface
+ * Create new instance of Wren VM
+ * 
+ * @param this instance
+ * @param bindings for built-ins
  */
-static bool ctor(void* self, va_list args) { return true; }
+static bool ctor(void* self, va_list args)
+{
+    WCScript* this = self;
+    WrenConfiguration config = {
+        .reallocateFn = realloc,
+        .resolveModuleFn = vm_resolve_module,
+        .loadModuleFn = vm_load_module,
+        .bindForeignClassFn = vm_register_foreign_class,
+        .bindForeignMethodFn = vm_register_foreign_method,
+        .writeFn = vm_log,
+        .errorFn = vm_error,
+        .initialHeapSize = 1024 * 1024 * 10,
+        .minHeapSize = 1024 * 1024,
+        .heapGrowthPercent = 50,
+        .userData = va_arg(args, void*)
+    };
+    this->vm = wrenNewVM(&config);
+    return true;
+}
 static bool equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
 static uint32_t hash(void* self) { return (uint32_t)self; }
 static void* copy(void* self) { return NULL; }
 static void dtor(void* self)
 {
-    Script* this = self;
-    printf("BYE!!!\n");
+    WCScript* this = self;
     wrenFreeVM(this->vm);
 }
 const static CFWClass class = {
-    .name = "Script",
-    .size = sizeof(Script),
+    .name = "WCScript",
+    .size = sizeof(WCScript),
     .ctor = ctor,
     .dtor = dtor,
     .equal = equal,
@@ -37,54 +57,7 @@ const static CFWClass class = {
     .copy = copy,
 };
 
-const CFWClass* ScriptClass = &class;
-
-void* New(Script* this, void* builtIns)
-{
-    WrenConfiguration config = {
-        .reallocateFn = realloc,
-        .resolveModuleFn = VMResolveModule,
-        .loadModuleFn = VMLoadModule,
-        .bindForeignClassFn = VMRegisterForeignClass,
-        .bindForeignMethodFn = VMRegisterForeignMethod,
-        .writeFn = VMLog,
-        .errorFn = VMError,
-        .initialHeapSize = 1024 * 1024 * 10,
-        .minHeapSize = 1024 * 1024,
-        .heapGrowthPercent = 50,
-        .userData = builtIns
-    };
-
-    this->vm = wrenNewVM(&config);
-    return this;
-}
-/**
- * Create new instance of Wren VM
- * 
- * @param this instance
- * @param builtIns foreign interface bindings
- */
-void* NewScript(void* builtIns)
-{
-    Script* this = cfw_create((CFWClass*)ScriptClass);
-
-    WrenConfiguration config = {
-        .reallocateFn = realloc,
-        .resolveModuleFn = VMResolveModule,
-        .loadModuleFn = VMLoadModule,
-        .bindForeignClassFn = VMRegisterForeignClass,
-        .bindForeignMethodFn = VMRegisterForeignMethod,
-        .writeFn = VMLog,
-        .errorFn = VMError,
-        .initialHeapSize = 1024 * 1024 * 10,
-        .minHeapSize = 1024 * 1024,
-        .heapGrowthPercent = 50,
-        .userData = builtIns
-    };
-
-    this->vm = wrenNewVM(&config);
-    return this;
-}
+const CFWClass* wc_script = &class;
 
 /**
  * Execute a string of script
@@ -92,13 +65,12 @@ void* NewScript(void* builtIns)
  * @param this instance
  * @param code string of script
  */
-Result ExecuteString(Script* this, char* code)
+Result wc_execute_string(WCScript* this, char* code)
 {
-    var res = wrenInterpret(this->vm, "main", code);
-    if (res == WREN_RESULT_COMPILE_ERROR) {
+    switch (wrenInterpret(this->vm, "main", code)) {
+    case WREN_RESULT_COMPILE_ERROR:
         return ResultCompileError;
-    }
-    if (res == WREN_RESULT_RUNTIME_ERROR) {
+    case WREN_RESULT_RUNTIME_ERROR:
         return ResultRuntimeError;
     }
     return ResultSuccess;
@@ -110,80 +82,16 @@ Result ExecuteString(Script* this, char* code)
  * @param this instance
  * @param name module name
  */
-Result ExecuteModule(Script* this, char* name)
+Result wc_execute_module(WCScript* this, char* name)
 {
-    var code = VMLoadModule(this->vm, name);
-    var result = wrenInterpret(this->vm, name, code);
-
-    if (result == WREN_RESULT_COMPILE_ERROR) {
+    const char* code = vm_load_module(this->vm, name);
+    switch (wrenInterpret(this->vm, name, code)) {
+    case WREN_RESULT_COMPILE_ERROR:
         return ResultCompileError;
-    }
-    if (result == WREN_RESULT_RUNTIME_ERROR) {
+    case WREN_RESULT_RUNTIME_ERROR:
         return ResultRuntimeError;
     }
     return ResultSuccess;
-}
-
-/**
- * Call a script method
- * 
- * @param this instance
- * @param name module name
- * @param name variable name
- * @param name method signature
- * @returns a function that calls the vm returning a string
- */
-void* CallMethodStr(Script* this, const char* module, const char* variable, const char* signature)
-{
-    wrenEnsureSlots(this->vm, 1);
-    wrenGetVariable(this->vm, module, variable, 0);
-    __block WrenHandle* handle = wrenGetSlotHandle(this->vm, 0);
-    __block WrenHandle* method = wrenMakeCallHandle(this->vm, signature);
-
-    return Block_copy(^() {
-        // call cached method 
-        wrenSetSlotHandle(this->vm, 0, handle);
-        wrenCall(this->vm, method);
-        // get return value
-        var t = wrenGetSlotType(this->vm, 0);
-        if (t != WREN_TYPE_STRING) {
-            wrenSetSlotString(this->vm, 0, "Invalid String Value");
-            wrenAbortFiber(this->vm, 0);
-            return (const char*)0;
-        }
-        const char* value = wrenGetSlotString(this->vm, 0);
-        return value;
-    });
-}
-
-/**
- * Call a script method
- * 
- * @param this instance
- * @param name module name
- * @param name variable name
- * @param name method signature
- * @returns a function that calls the vm returning a double
- */
-void* CallMethodNum(Script* this, const char* module, const char* variable, const char* signature)
-{
-    wrenEnsureSlots(this->vm, 1);
-    wrenGetVariable(this->vm, module, variable, 0);
-    __block WrenHandle* handle = wrenGetSlotHandle(this->vm, 0);
-    __block WrenHandle* method = wrenMakeCallHandle(this->vm, signature);
-
-    return Block_copy(^() {
-        wrenSetSlotHandle(this->vm, 0, handle);
-        wrenCall(this->vm, method);
-        var t = wrenGetSlotType(this->vm, 0);
-        if (t != WREN_TYPE_NUM) {
-            wrenSetSlotString(this->vm, 0, "Invalid Number Value");
-            wrenAbortFiber(this->vm, 0);
-            return (double)0;
-        }
-        double value = wrenGetSlotDouble(this->vm, 0);
-        return value;
-    });
 }
 
 //////////////////////////////////////////////////////////////
@@ -191,43 +99,43 @@ void* CallMethodNum(Script* this, const char* module, const char* variable, cons
 //////////////////////////////////////////////////////////////
 
 /**
- * VMResolveModule
+ * vm_resolve_module
  * 
  * Resolve the module path 
- * @param VM
+ * @param vm
  * @param importer
  * @param name
  * @returns resolved name
  */
-const char* VMResolveModule(WrenVM* vm,
+const char* vm_resolve_module(WrenVM* vm,
     const char* importer,
     const char* name)
 {
     return name;
 }
 /**
- * VMLog
+ * vm_log
  * 
  * Log message
- * @param VM
+ * @param vm
  * @param text to print
  * @returns none
  */
-void VMLog(WrenVM* vm,
+void vm_log(WrenVM* vm,
     const char* text)
 {
     fputs(text, stdout);
 }
 
 /**
- * VMLoadModule
+ * vm_load_module
  * 
  * Load the module from the file system
- * @param VM
+ * @param vm
  * @param module name
  * @returns loaded module as string
  */
-char* VMLoadModule(WrenVM* vm,
+char* vm_load_module(WrenVM* vm,
     const char* moduleName)
 {
     char* path = join("data/wren/", moduleName, ".wren");
@@ -239,9 +147,9 @@ char* VMLoadModule(WrenVM* vm,
 }
 
 /**
- * VMError
+ * vm_error
  * 
- * @param VM
+ * @param vm
  * @param type of error
  * @param module
  * @param line
@@ -249,7 +157,7 @@ char* VMLoadModule(WrenVM* vm,
  * @returns none
  * Display Wren Error
  */
-void VMError(WrenVM* vm,
+void vm_error(WrenVM* vm,
     WrenErrorType type,
     const char* module,
     int line,
@@ -269,24 +177,24 @@ void VMError(WrenVM* vm,
 }
 
 /**
- * VMRegisterForeignClass
+ * vm_register_foreign_class
  * 
  * Bind a module / class
  * @param module
  * @param className
  * @returns array of methods
  */
-WrenForeignClassMethods VMRegisterForeignClass(WrenVM* vm,
+WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm,
     const char* module,
     const char* className)
 {
-    var bindings = (WrenScript*)wrenGetUserData(vm);
+    WrenScript* bindings = (WrenScript*)wrenGetUserData(vm);
 
     WrenForeignClassMethods methods;
     methods.allocate = NULL;
     methods.finalize = NULL;
 
-    for (var i = 0; bindings[i].module != NULL; i++) {
+    for (int i = 0; bindings[i].module != NULL; i++) {
         if (strcmp(module, bindings[i].module) != 0)
             continue;
         if (strcmp(className, bindings[i].className) != 0)
@@ -299,7 +207,7 @@ WrenForeignClassMethods VMRegisterForeignClass(WrenVM* vm,
 }
 
 /**
- * VMRegisterForeignMethod
+ * vm_register_foreign_method
  * 
  * Bind method
  * @param module
@@ -308,21 +216,21 @@ WrenForeignClassMethods VMRegisterForeignClass(WrenVM* vm,
  * @param signature
  * @returns address of method
  */
-WrenForeignMethodFn VMRegisterForeignMethod(WrenVM* vm,
+WrenForeignMethodFn vm_register_foreign_method(WrenVM* vm,
     const char* module,
     const char* className,
     bool isStatic,
     const char* signature)
 {
-    var bindings = (WrenScript*)wrenGetUserData(vm);
+    WrenScript* bindings = (WrenScript*)wrenGetUserData(vm);
 
-    for (var i = 0; bindings[i].module != NULL; i++) {
+    for (int i = 0; bindings[i].module != NULL; i++) {
         if (strcmp(module, bindings[i].module) != 0)
             continue;
         if (strcmp(className, bindings[i].className) != 0)
             continue;
 
-        for (var j = 0; bindings[i].methods[j].addr != NULL; j++) {
+        for (int j = 0; bindings[i].methods[j].addr != NULL; j++) {
             bool is_static = (bindings[i].methods[j].name[0] == '+');
             if (is_static != isStatic)
                 continue;

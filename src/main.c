@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 
     CFWRefPool *pool = cfw_new(cfw_refpool);
 
-    switch (ExecuteModule(NewScript((void*)&builtIns), "main")) {
+    switch (wc_execute_module(cfw_create(wc_script, &builtIns), "main")) {
     case ResultSuccess:
         fputs("wrenInterpret(): ", stdout);
         fputs("Ok\n", stdout);

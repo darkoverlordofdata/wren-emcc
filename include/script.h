@@ -4,15 +4,9 @@
 /**
  * Bind Wren Script to native functions
  */
-
-typedef struct Script Script;
-extern const CFWClass* ScriptClass;
-
-/**
- * Class Script
- */
-
-struct Script {
+typedef struct WCScript WCScript;
+extern const CFWClass* wc_script;
+struct WCScript {
     CFWObject obj;
     WrenVM* vm;
 };
@@ -38,9 +32,6 @@ typedef enum {
     ResultRuntimeError
 } Result;
 
-extern void* New(Script* this, void* builtIns);
-extern void* NewScript(void* builtIns);
-extern Result ExecuteString(Script* this, char* code);
-extern Result ExecuteModule(Script* this, char* code);
-extern void* CallMethodStr(Script* this, const char* module, const char* variable, const char* signature);
-extern void* CallMethodNum(Script* this, const char* module, const char* variable, const char* signature);
+
+extern Result wc_execute_string(WCScript* this, char* name);
+extern Result wc_execute_module(WCScript* this, char* name);
