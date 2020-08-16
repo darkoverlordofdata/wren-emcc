@@ -1,0 +1,313 @@
+import "io" for Path, Stream
+
+class Main {
+    construct new() { }
+    main() { 
+
+	    System.print("Hello world")
+
+        var x = Path.new(Path.Cwd)
+        x.Join("readme.md")
+        System.print("-------------------------------------\n")
+        System.print(Path.Cwd)
+        System.print(x.ToString())
+        System.print("-------------------------------------\n")
+
+        var s = Stream.new(x.ToString())
+        var data = s.Read()
+        System.print(data)
+    }
+
+}
+
+var z = Main.new()
+z.main()
+import "io" for Path
+import "math" for Vec3, Mat
+
+class Main {
+    construct new() {
+	    System.print("Hello world")
+        System.print("======================================\n")
+        var p = Path.new("~/GitHub/wren-emcc")
+
+        System.print(p.ToString())
+    }
+
+    static helloWorld() { 
+
+        return "Hola Mundo"
+
+    }
+    testly() {
+        return "Hello World"
+    }
+
+    vectors() {
+        var a = Vec3.new(1, 2, 3)
+        var b = Vec3.new(4, 5, 6)
+
+        var z = a.dot(b)
+        return z
+        // return 0
+
+    }
+
+    vectorx() {
+        var a = Vec3.new(1, 2, 3)
+        return a.z
+        // return 0
+
+    }
+}
+
+var test = Main.new()
+
+var z = Mat.new()
+z.identity()
+System.print("%(z[0, 0]) %(z[0, 1]) %(z[0, 2]) %(z[0, 3])")
+System.print("%(z[1, 0]) %(z[1, 1]) %(z[1, 2]) %(z[1, 3])")
+System.print("%(z[2, 0]) %(z[2, 1]) %(z[2, 2]) %(z[2, 3])")
+System.print("%(z[3, 0]) %(z[3, 1]) %(z[3, 2]) %(z[3, 3])")
+
+
+var fiber = Fiber.new {|param|
+  System.print(param)
+  var result = Fiber.yield()
+  System.print(result)
+}
+
+fiber.call("First")
+fiber.call("Second")
+
+class Counter {
+  static create() {
+    var i = 0
+    return Fn.new { i = i + 1 }
+  }
+}
+var counter = Counter.create()
+System.print(counter.call()) //> 1
+System.print(counter.call()) //> 2
+System.print(counter.call()) //> 3class File {
+    /**
+     * The system-dependent path-separator character.
+     * On UNIX systems the value of this
+     * field is <code>'/'</code>; on Microsoft Windows systems it is <code>'\\'</code>.
+     *
+     */
+    static PathSeparator { "/" }
+    /**
+     * Returns the length of this abstract pathname's prefix.
+     * For use by FileSystem classes.
+     */
+    PrefixLength { _prefixLength }
+
+    
+    /**
+     * Returns the name of the file or directory denoted by this abstract
+     * pathname.  This is just the last name in the pathname's name
+     * sequence.  If the pathname's name sequence is empty, then the empty
+     * string is returned.
+     *
+     */
+    Name { _name }
+    /**
+     * Returns the pathname string of this abstract pathname's parent, or
+     * <code>null</code> if this pathname does not name a parent directory.
+     *
+     */
+    Parent { parent }
+    /**
+     * Converts this abstract pathname into a pathname string.  The resulting
+     * string uses the {@link #separator default name-separator character} to
+     * separate the names in the name sequence.
+     *
+     */
+    Path { _path }
+    /**
+     * Tests whether the file or directory denoted by this abstract pathname
+     * exists.
+     *
+     */
+    construct Create(path) {
+        _path = path
+    }
+
+    construct Create(parent, child) {
+        _path = parent + "/" + child
+    }
+
+
+    Exists() {
+
+    }
+    /**
+     * Tests whether the file denoted by this abstract pathname is a
+     * directory.
+     */
+    IsDirectory() {
+
+    }
+    /**
+     * Tests whether the file denoted by this abstract pathname is a normal
+     * file.  A file is <em>normal</em> if it is not a directory and, in
+     * addition, satisfies other system-dependent criteria.  Any non-directory
+     * file created by a Java application is guaranteed to be a normal file.
+     *
+     */
+    IsFile() {
+
+    }
+ }
+
+foreign class Path { 
+    construct new(path) {}
+
+    // An absolute path, starting with "/" on POSIX systems, a drive letter on
+    // Windows, etc.
+    foreign static Absolute
+
+    // An explicitly relative path, starting with "./" or "../".
+    foreign static Relative
+
+    // A path that has no leading prefix, like "foo/bar".
+    foreign static Simple
+
+    // the current working directory
+    foreign static Cwd 
+
+    // Categorizes what form a path is.
+    foreign static Type(string)
+
+    // Strips off the last component of the path name.
+    foreign DirName()
+
+    // Strips off the file extension from the last component of the path.
+    foreign RemoveExtension()
+
+    // Appends [string] to [path].
+    foreign Join(string)
+
+    // Appends [c] to the path, growing the buffer if needed.
+    foreign AppendChar(c)
+
+    // Appends [string] to the path, growing the buffer if needed.
+    foreign AppendString(string)
+
+    // Simplifies the path string as much as possible.
+    //
+    // Applies and removes any "." or ".." components, collapses redundant "/"
+    // characters, and normalizes all path separators to "/".
+    foreign Normalize()
+
+    // Allocates a new string exactly the right length and copies this path to it.
+    foreign ToString()
+}
+
+foreign class Stream { 
+    construct new(path) {}
+
+    foreign Write(text) 
+    foreign Close() 
+    foreign Read()
+}
+/**
+ * Native Vector2
+ */
+foreign class Vec2 {
+  construct new( x, y ) {}
+
+  foreign clamp(a, b)
+  foreign dot( rhs )
+  foreign length()
+  foreign norm()
+  foreign norm2()
+  foreign normalize()
+
+  // accessors
+  foreign x
+  foreign x=( rhs )
+  foreign y
+  foreign y=( rhs )
+}
+
+
+
+/**
+ * Native Vector3
+ */
+foreign class Vec3 {
+  construct new( x, y, z ) {}
+
+  foreign clamp(a, b)
+  foreign dot( rhs )
+  foreign length()
+  foreign norm()
+  foreign norm2()
+  foreign normalize()
+
+  // accessors
+  foreign x
+  foreign x=( rhs )
+  foreign y
+  foreign y=( rhs )
+  foreign z
+  foreign z=( rhs )
+}
+
+/**
+ * Native Vector4
+ */
+foreign class Vec4 {
+  construct new( x, y, z, w ) {}
+
+  foreign clamp(a, b)
+  foreign dot( rhs )
+  foreign length()
+  foreign norm()
+  foreign norm2()
+
+  // accessors
+  foreign x
+  foreign x=( rhs )
+  foreign y
+  foreign y=( rhs )
+  foreign z
+  foreign z=( rhs )
+  foreign w
+  foreign w=( rhs )
+}
+
+/**
+ * Native Matrix4x4
+ */
+foreign class Mat {
+  construct new( ) {}
+
+  foreign identity()
+  foreign scale( rhs )
+  foreign ortho( left, right, bottom, top, nearVal, farVal)
+  foreign rotate( angle, vec)
+
+  foreign [col, row]
+
+}
+
+# wren emcc
+
+
+## emscripten first
+wren bindings designed to work on emscripten
+
+## gui
+nuklear works with emscripten using SDL2 and GLES2. The alternative is glfw+stb etc., so it has some advantages when loading resources.
+
+
+## libuv
+other wren based projects use libuv, but I want to be emscripten first - libuv doesn't work (https://github.com/libuv/help/issues/128) in emscripten.
+
+proposed solutions:
+* use libuv on desktop and libuv-em on emscripten?
+* use 1 new api that works on either desktop or browser?
+

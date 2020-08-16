@@ -1,15 +1,15 @@
 #pragma once
-#include <cfw.h>
+#include <corefw/corefw.h>
 #include <wren.h>
 /**
  * Bind Wren Script to native functions
  */
-typedef struct WCScript WCScript;
-extern const CFWClass* wc_script;
-struct WCScript {
+
+extern CFWClass* wc_script;
+typedef struct WCScript {
     CFWObject obj;
     WrenVM* vm;
-};
+} WCScript;
 
 typedef struct WrenMethod {
     char* name;

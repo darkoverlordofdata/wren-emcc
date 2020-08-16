@@ -2,8 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <wren.h>
-#include <dna.h>
-
+// #include <dna.h>
+#include <tglm/tglm.h>
 void math_mat_allocate(WrenVM* vm) 
 { 
     float* data = wrenSetSlotNewForeign(vm, 0, 0, sizeof(float[16]));

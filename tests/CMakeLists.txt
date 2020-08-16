@@ -5,8 +5,8 @@ add_executable ( test_main test_main.c
 
 add_executable ( test_wren test_wren.c 
                     unity/unity.c 
-                    ../src/script.c  
-                    ../src/method.c 
+                    ../src/wc/script.c  
+                    ../src/wc/method.c 
                     ../src/io/File.c
                     ../src/io/Path.c
                     ../src/io/Stream.c

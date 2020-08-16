@@ -1,9 +1,8 @@
-#include <cfw.h>
+// #include <cfw.h>
+#include <corefw/corefw.h>
 #include <stdio.h>
 #include <wren.h>
-#include "builtins.h"
-#include "script.h"
-#include "method.h"
+#include "wc/wc.h"
 #include "unity/unity.h"
 
 CFWRefPool* pool;

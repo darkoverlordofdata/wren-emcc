@@ -1,24 +1,35 @@
-#include "script.h"
-#include <Block.h>
-#include <cfw.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <wren.h>
+#include "wc/wc.h"
 /**
  * WrenVM interface
  */
-void vm_log(WrenVM* vm, const char* text);
-void vm_error(WrenVM* vm, WrenErrorType type, const char* module, int line, const char* message);
-const char* vm_resolve_module(WrenVM* vm, const char* importer, const char* name);
-char* vm_load_module(WrenVM* vm, const char* moduleName);
-WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm, const char* module, const char* className);
-WrenForeignMethodFn vm_register_foreign_method(WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature);
+static void vm_log(WrenVM* vm, const char* text);
+static void vm_error(WrenVM* vm, WrenErrorType type, const char* module, int line, const char* message);
+static const char* vm_resolve_module(WrenVM* vm, const char* importer, const char* name);
+static char* vm_load_module(WrenVM* vm, const char* moduleName);
+static WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm, const char* module, const char* className);
+static WrenForeignMethodFn vm_register_foreign_method(WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature);
+
+//#include <corefw/file-private.h>
+struct CFWFile {
+	CFWStream stream;
+	int fd;
+	bool at_end;
+};
 
 /**
  * Create new instance of Wren VM
  * 
  * @param this instance
  * @param bindings for built-ins
+ * @returns an object that wraps the script
  */
 static bool ctor(void* self, va_list args)
 {
@@ -42,12 +53,22 @@ static bool ctor(void* self, va_list args)
 static bool equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
 static uint32_t hash(void* self) { return (uint32_t)self; }
 static void* copy(void* self) { return NULL; }
+
+/**
+ * Release resources
+ * 
+ * @param this instance
+ */
 static void dtor(void* self)
 {
     WCScript* this = self;
     wrenFreeVM(this->vm);
 }
-const static CFWClass class = {
+
+/**
+ * WCScript Type VTable
+ */
+static CFWClass class = {
     .name = "WCScript",
     .size = sizeof(WCScript),
     .ctor = ctor,
@@ -57,7 +78,8 @@ const static CFWClass class = {
     .copy = copy,
 };
 
-const CFWClass* wc_script = &class;
+// const 
+CFWClass* wc_script = &class;
 
 /**
  * Execute a string of script
@@ -72,8 +94,9 @@ Result wc_execute_string(WCScript* this, char* code)
         return ResultCompileError;
     case WREN_RESULT_RUNTIME_ERROR:
         return ResultRuntimeError;
+    case WREN_RESULT_SUCCESS:
+        return ResultSuccess;
     }
-    return ResultSuccess;
 }
 
 /**
@@ -90,8 +113,9 @@ Result wc_execute_module(WCScript* this, char* name)
         return ResultCompileError;
     case WREN_RESULT_RUNTIME_ERROR:
         return ResultRuntimeError;
+    case WREN_RESULT_SUCCESS:
+        return ResultSuccess;
     }
-    return ResultSuccess;
 }
 
 //////////////////////////////////////////////////////////////
@@ -107,7 +131,7 @@ Result wc_execute_module(WCScript* this, char* name)
  * @param name
  * @returns resolved name
  */
-const char* vm_resolve_module(WrenVM* vm,
+static const char* vm_resolve_module(WrenVM* vm,
     const char* importer,
     const char* name)
 {
@@ -121,10 +145,41 @@ const char* vm_resolve_module(WrenVM* vm,
  * @param text to print
  * @returns none
  */
-void vm_log(WrenVM* vm,
+static void vm_log(WrenVM* vm,
     const char* text)
 {
     fputs(text, stdout);
+}
+
+/**
+ * ReadTextFile
+ * 
+ * @param path path to file
+ * @returns string with file contents
+ * 
+ */
+static CFWString* read_text_file(char* path)
+{
+    struct stat statbuf;
+
+    CFWFile* handle = cfw_new(cfw_file, path, "r");
+    if (!handle) {
+        printf("Unable to open %s\n", path);
+        return cfw_create(cfw_string, "");
+    }
+
+    if (fstat(handle->fd, &statbuf) == -1) {
+        printf("Unable to stat %s\n", path);
+        return cfw_create(cfw_string, "");
+    }
+    
+    long len = statbuf.st_size;
+    char* content = (char*)calloc(1, len + 1);
+    cfw_stream_read(handle, content, len);
+    cfw_stream_close(handle);
+    CFWString* result = cfw_create(cfw_string, content);
+    free(content);
+    return result;
 }
 
 /**
@@ -135,13 +190,15 @@ void vm_log(WrenVM* vm,
  * @param module name
  * @returns loaded module as string
  */
-char* vm_load_module(WrenVM* vm,
+static char* vm_load_module(WrenVM* vm,
     const char* moduleName)
 {
-    char* path = join("data/wren/", moduleName, ".wren");
-    CFWString* source = CFWFS.readTextFile((char*)path);
+    CFWString* path = cfw_create(cfw_string, "data/wren/");
+    cfw_string_append_c(path, moduleName);
+    cfw_string_append_c(path, ".wren");
+    
+    CFWString* source = read_text_file(cfw_string_c(path));
     char* result = cfw_strdup(cfw_string_c(source));
-    free(path);
     cfw_unref(source);
     return result;
 }
@@ -157,7 +214,7 @@ char* vm_load_module(WrenVM* vm,
  * @returns none
  * Display Wren Error
  */
-void vm_error(WrenVM* vm,
+static void vm_error(WrenVM* vm,
     WrenErrorType type,
     const char* module,
     int line,
@@ -184,7 +241,7 @@ void vm_error(WrenVM* vm,
  * @param className
  * @returns array of methods
  */
-WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm,
+static WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm,
     const char* module,
     const char* className)
 {
@@ -216,7 +273,7 @@ WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm,
  * @param signature
  * @returns address of method
  */
-WrenForeignMethodFn vm_register_foreign_method(WrenVM* vm,
+static WrenForeignMethodFn vm_register_foreign_method(WrenVM* vm,
     const char* module,
     const char* className,
     bool isStatic,

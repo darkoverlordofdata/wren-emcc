@@ -1,24 +1,23 @@
-#include "script.h"
-#include "method.h"
-#include <Block.h>
-#include <cfw.h>
 #include <stdio.h>
 #include <string.h>
 #include <wren.h>
+#include "wc/wc.h"
 
-typedef struct WCMethod WCMethod;
-
-struct WCMethod {
+/**
+ * WCMethod Type Instance data
+ */
+typedef struct WCMethod {
     CFWObject obj;
-    const char* module;
-    const char* variable;
-    const char* signature;
+    char* module;
+    char* variable;
+    char* signature;
     WCScript* script;
     WrenHandle* handle;
     WrenHandle* method;
-};
+} WCMethod;
 
 /**
+ * WCMethod:
  * Call a script method
  * 
  * @param this instance
@@ -45,6 +44,12 @@ static bool ctor(void* self, va_list args)
 static bool equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
 static uint32_t hash(void* self) { return (uint32_t)self; }
 static void* copy(void* self) { return NULL; }
+
+/**
+ * Release resources
+ * 
+ * @param this instance
+ */
 static void dtor(void* self)
 {
     WCMethod* this = self;
@@ -56,7 +61,10 @@ static void dtor(void* self)
     free(this->signature);
 }
 
-const static CFWClass class = {
+/**
+ * WCMethod Type VTable
+ */
+static CFWClass class = {
     .name = "WCMethod",
     .size = sizeof(WCMethod),
     .ctor = ctor,
@@ -66,7 +74,7 @@ const static CFWClass class = {
     .copy = copy,
 };
 
-const CFWClass* wc_method = &class;
+CFWClass* wc_method = &class;
 
 /**
  * Call a script method
@@ -80,7 +88,7 @@ const char* wc_method_str(WCMethod* this)
     wrenSetSlotHandle(this->script->vm, 0, this->handle);
     wrenCall(this->script->vm, this->method);
     // get return value
-    var t = wrenGetSlotType(this->script->vm, 0);
+    int t = wrenGetSlotType(this->script->vm, 0);
     if (t != WREN_TYPE_STRING) {
         wrenSetSlotString(this->script->vm, 0, "Invalid String Value");
         wrenAbortFiber(this->script->vm, 0);
@@ -102,7 +110,7 @@ double wc_method_num(WCMethod* this)
     wrenSetSlotHandle(this->script->vm, 0, this->handle);
     wrenCall(this->script->vm, this->method);
     // get return value
-    var t = wrenGetSlotType(this->script->vm, 0);
+    int t = wrenGetSlotType(this->script->vm, 0);
     if (t != WREN_TYPE_NUM) {
         wrenSetSlotString(this->script->vm, 0, "Invalid Number Value");
         wrenAbortFiber(this->script->vm, 0);
@@ -124,7 +132,7 @@ bool wc_method_bool(WCMethod* this)
     wrenSetSlotHandle(this->script->vm, 0, this->handle);
     wrenCall(this->script->vm, this->method);
     // get return value
-    var t = wrenGetSlotType(this->script->vm, 0);
+    int t = wrenGetSlotType(this->script->vm, 0);
     if (t != WREN_TYPE_BOOL) {
         wrenSetSlotString(this->script->vm, 0, "Invalid Boolean Value");
         wrenAbortFiber(this->script->vm, 0);

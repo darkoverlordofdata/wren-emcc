@@ -1,8 +1,6 @@
 #include "io/io.h"
 #include "math/math.h"
 #include "script.h"
-#include <Block.h>
-#include <cfw.h>
 #include <stdio.h>
 #include <wren.h>
 

@@ -5,7 +5,6 @@ include(CTest)
 enable_testing()
 
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -std=c11 -O0 -g" )
-set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks" )
 
 #
 # set (SOURCE ${SOURCE} ${CMAKE_CURRENT_SOURCE_DIR}/src/shmupwarz.c )
@@ -14,15 +13,10 @@ set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks" )
 #     list ( APPEND RESOURCES ${resources_gresource_xml_C_FILE} )
 # endif ()
 
-add_subdirectory ( libs/cfw )
-add_subdirectory ( libs/dna )
-
-
-
 add_executable( ${PROJECT_NAME}  #src/main.c ${SOURCE} )
     src/main.c 
-    src/script.c 
-    src/method.c 
+    src/wc/script.c 
+    src/wc/method.c 
     src/io/File.c
     src/io/Path.c
     src/io/Stream.c
@@ -34,16 +28,13 @@ add_executable( ${PROJECT_NAME}  #src/main.c ${SOURCE} )
     ${SOURCE} )
 
 include_directories( include )
-include_directories( libs/cfw/include )
-include_directories( libs/dna/include )
 include_directories( libs/wren/include )
-include_directories( external/stb )
-# include_directories( external/linmath.h )
+include_directories( external/linmath.h )
  
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L${CMAKE_CURRENT_SOURCE_DIR}/libs" )
 
 add_subdirectory(tests)
-target_link_libraries ( ${PROJECT_NAME} dl m BlocksRuntime wren corefw glfw GL )
+target_link_libraries ( ${PROJECT_NAME} dl m wren corefw SDL2 GLESv2 GL )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

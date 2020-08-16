@@ -6,6 +6,8 @@
             "label": "build",
             "command": "emcc",
             "args": [
+                "-std=c18",
+                "-fblocks",
                 "tests/test_wren.c",
                 "src/script.c", 
                 "src/math/Mat.c",
@@ -30,9 +32,6 @@
                 "libs/libcorefw.bc",
                 "libs/libwren.bc",
                 "libs/libBlocksRuntime.bc",
-                "-std=c18",
-                "-fblocks",
-                "-fenable-matrix",
                 "-Ilibs/cfw/include",
                 "-Ilibs/dna/include",
                 "-Ilibs/wren/include",
