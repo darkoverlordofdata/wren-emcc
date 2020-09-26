@@ -1,33 +1,29 @@
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <wren.h>
+#include <limits.h>
 #ifdef _WIN32
 #include <direct.h>
-#include <limits.h>
-#define GetCwd _getcwd
-#define PATH_MAX MAX_PATH
 #else
-#define PATH_MAX 4096
-#define GetCwd getcwd
+#include <unistd.h>
 #endif
 #include "wren/path.h"
 #include "io/Path.h"
-
 /**
- *  io.path.Allocate
+ * Wren bindings for Path object
+ */
+/**
+ *  io_path_Allocate
  */
 void io_path_Allocate(WrenVM* vm)
 {
-    // printf("io_path_Allocate\n");
     Path** path = (Path**)wrenSetSlotNewForeign(vm, 0, 0, sizeof(Path*));
     const char* value = wrenGetSlotString(vm, 1);
-    // printf("io_path_Allocate - value: %s\n", value);
     *path = pathNew(value);
 }
 
 /**
- *  io.path.Finalize
+ *  io_path_Finalize
  * 
  */
 void io_path_Finalize(void* data)
@@ -51,9 +47,14 @@ void io_path_Simple(WrenVM* vm)
 
 void io_path_Cwd(WrenVM* vm)
 {
-    char cwd[PATH_MAX];
-
-    if (GetCwd(cwd, sizeof(cwd)) == NULL) {
+#ifdef _WIN32
+    char cwd[MAX_PATH];
+    if (_getcwd(cwd, sizeof(cwd)) == NULL) 
+#else
+    char cwd[4096];
+    if (getcwd(cwd, sizeof(cwd)) == NULL) 
+#endif
+    {
         wrenSetSlotString(vm, 0, "No CWD!");
         wrenAbortFiber(vm, 0);
         return;
@@ -61,7 +62,7 @@ void io_path_Cwd(WrenVM* vm)
     wrenSetSlotString(vm, 0, cwd);
 }
 /**
- *  io.path.type
+ *  io_path_type
  * 
  *  Categorizes what form a path is.
  */
@@ -71,7 +72,7 @@ void io_path_Type(WrenVM* vm)
     wrenSetSlotDouble(vm, 0, pathType(path));
 }
 /**
- *  io.path.DirName
+ *  io_path_DirName
  * 
  *  Strips off the last component of the path name.
  */
@@ -82,7 +83,7 @@ void io_path_DirName(WrenVM* vm)
 }
 
 /**
- *  io.path.RemoveExtension
+ *  io_path_RemoveExtension
  * 
  *  Strips off the file extension from the last component of the path.
  */
@@ -93,7 +94,7 @@ void io_path_RemoveExtension(WrenVM* vm)
 }
 
 /**
- *  io.path.Join
+ *  io_path_Join
  * 
  *  Appends [string] to [path].
  */
@@ -105,7 +106,7 @@ void io_path_Join(WrenVM* vm)
 }
 
 /**
- *  io.path.AppendChar
+ *  io_path_AppendChar
  * 
  *  Appends [c] to the path, growing the buffer if needed.
  */
@@ -117,11 +118,11 @@ void io_path_AppendChar(WrenVM* vm)
 }
 
 /**
- *  io.path.AppendString
+ *  io_path_AppendString
  * 
  *  Appends [string] to the path, growing the buffer if needed.
  */
-void io_path_AppemdString(WrenVM* vm)
+void io_path_AppendString(WrenVM* vm)
 {
     Path** path = (Path**)wrenGetSlotForeign(vm, 0);
     const char* value = wrenGetSlotString(vm, 1);
@@ -129,7 +130,7 @@ void io_path_AppemdString(WrenVM* vm)
 }
 
 /**
- *  io.path.Normalize
+ *  io_path_Normalize
  * 
  *  Simplifies the path string as much as possible.
  *
@@ -143,7 +144,7 @@ void io_path_Normalize(WrenVM* vm)
 }
 
 /**
- *  io.path.ToString
+ *  io_path_ToString
  * 
  *  Allocates a new string exactly the right length and copies this path to it.
  */
@@ -152,4 +153,5 @@ void io_path_ToString(WrenVM* vm)
     Path** path = (Path**)wrenGetSlotForeign(vm, 0);
     char* value = pathToString(*path);
     wrenSetSlotString(vm, 0, value);
+    free(value); // wren created it's own copy
 }

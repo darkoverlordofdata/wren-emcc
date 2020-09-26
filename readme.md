@@ -5,7 +5,7 @@
 wren bindings designed to work on emscripten
 
 ## gui
-nuklear works with emscripten using SDL2 and GLES2. The alternative is glfw+stb etc., so it has some advantages when loading resources.
+nuklear works with emscripten using SDL2 and GLES2. So that makes up my mind. That's fine, glfw3 requires stb_image and other additional librries.
 
 
 ## libuv

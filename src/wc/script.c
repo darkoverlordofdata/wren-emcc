@@ -2,20 +2,45 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
 #include <stdio.h>
 #include <string.h>
 #include <wren.h>
 #include "wc/wc.h"
+#include "wc/script-private.h"
+
 /**
- * WrenVM interface
+ * CFWClass Interface
  */
-static void vm_log(WrenVM* vm, const char* text);
-static void vm_error(WrenVM* vm, WrenErrorType type, const char* module, int line, const char* message);
-static const char* vm_resolve_module(WrenVM* vm, const char* importer, const char* name);
-static char* vm_load_module(WrenVM* vm, const char* moduleName);
-static WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm, const char* module, const char* className);
-static WrenForeignMethodFn vm_register_foreign_method(WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature);
+static bool wc_script_ctor(void* self, va_list args);
+static bool wc_script_equal(void* ptr1, void* ptr2);
+static uint32_t wc_script_hash(void* self);
+static void* wc_script_copy(void* self);
+static void wc_script_dtor(void* self);
+/**
+ * WCScript internal interface
+ */
+static void wc_script_log(WrenVM* vm, const char* text);
+static void wc_script_error(WrenVM* vm, WrenErrorType type, const char* module, int line, const char* message);
+static const char* wc_script_resolve_module(WrenVM* vm, const char* importer, const char* name);
+static char* wc_script_load_module(WrenVM* vm, const char* moduleName);
+static WrenForeignClassMethods wc_script_register_foreign_class(WrenVM* vm, const char* module, const char* className);
+static WrenForeignMethodFn wc_script_register_foreign_method(WrenVM* vm, const char* module, const char* className, bool isStatic, const char* signature);
+
+/**
+ * WCScript Type VTable
+ */
+static CFWClass class = {
+    .name = "WCScript",
+    .size = sizeof(WCScript),
+    .ctor = wc_script_ctor,
+    .dtor = wc_script_dtor,
+    .equal = wc_script_equal,
+    .hash = wc_script_hash,
+    .copy = wc_script_copy,
+};
+
+// const 
+CFWClass* wc_script = &class;
 
 //#include <corefw/file-private.h>
 struct CFWFile {
@@ -31,17 +56,17 @@ struct CFWFile {
  * @param bindings for built-ins
  * @returns an object that wraps the script
  */
-static bool ctor(void* self, va_list args)
+static bool wc_script_ctor(void* self, va_list args)
 {
     WCScript* this = self;
     WrenConfiguration config = {
         .reallocateFn = realloc,
-        .resolveModuleFn = vm_resolve_module,
-        .loadModuleFn = vm_load_module,
-        .bindForeignClassFn = vm_register_foreign_class,
-        .bindForeignMethodFn = vm_register_foreign_method,
-        .writeFn = vm_log,
-        .errorFn = vm_error,
+        .resolveModuleFn = wc_script_resolve_module,
+        .loadModuleFn = wc_script_load_module,
+        .bindForeignClassFn = wc_script_register_foreign_class,
+        .bindForeignMethodFn = wc_script_register_foreign_method,
+        .writeFn = wc_script_log,
+        .errorFn = wc_script_error,
         .initialHeapSize = 1024 * 1024 * 10,
         .minHeapSize = 1024 * 1024,
         .heapGrowthPercent = 50,
@@ -50,36 +75,24 @@ static bool ctor(void* self, va_list args)
     this->vm = wrenNewVM(&config);
     return true;
 }
-static bool equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
-static uint32_t hash(void* self) { return (uint32_t)self; }
-static void* copy(void* self) { return NULL; }
+static bool wc_script_equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
+static uint32_t wc_script_hash(void* self) { return (uint32_t)self; }
+static void* wc_script_copy(void* self) { return NULL; }
 
 /**
  * Release resources
  * 
  * @param this instance
  */
-static void dtor(void* self)
+static void wc_script_dtor(void* self)
 {
     WCScript* this = self;
     wrenFreeVM(this->vm);
 }
 
-/**
- * WCScript Type VTable
- */
-static CFWClass class = {
-    .name = "WCScript",
-    .size = sizeof(WCScript),
-    .ctor = ctor,
-    .dtor = dtor,
-    .equal = equal,
-    .hash = hash,
-    .copy = copy,
-};
-
-// const 
-CFWClass* wc_script = &class;
+//////////////////////////////////////////////////////////////
+/// Public WSScript* interface
+//////////////////////////////////////////////////////////////
 
 /**
  * Execute a string of script
@@ -87,15 +100,15 @@ CFWClass* wc_script = &class;
  * @param this instance
  * @param code string of script
  */
-Result wc_execute_string(WCScript* this, char* code)
+WCSResult wc_execute_string(WCScript* this, char* code)
 {
     switch (wrenInterpret(this->vm, "main", code)) {
     case WREN_RESULT_COMPILE_ERROR:
-        return ResultCompileError;
+        return WCSResultCompileError;
     case WREN_RESULT_RUNTIME_ERROR:
-        return ResultRuntimeError;
+        return WCSResultRuntimeError;
     case WREN_RESULT_SUCCESS:
-        return ResultSuccess;
+        return WCSResultSuccess;
     }
 }
 
@@ -105,16 +118,16 @@ Result wc_execute_string(WCScript* this, char* code)
  * @param this instance
  * @param name module name
  */
-Result wc_execute_module(WCScript* this, char* name)
+WCSResult wc_execute_module(WCScript* this, char* name)
 {
-    const char* code = vm_load_module(this->vm, name);
+    const char* code = wc_script_load_module(this->vm, name);
     switch (wrenInterpret(this->vm, name, code)) {
     case WREN_RESULT_COMPILE_ERROR:
-        return ResultCompileError;
+        return WCSResultCompileError;
     case WREN_RESULT_RUNTIME_ERROR:
-        return ResultRuntimeError;
+        return WCSResultRuntimeError;
     case WREN_RESULT_SUCCESS:
-        return ResultSuccess;
+        return WCSResultSuccess;
     }
 }
 
@@ -123,7 +136,7 @@ Result wc_execute_module(WCScript* this, char* name)
 //////////////////////////////////////////////////////////////
 
 /**
- * vm_resolve_module
+ * wc_script_resolve_module
  * 
  * Resolve the module path 
  * @param vm
@@ -131,21 +144,21 @@ Result wc_execute_module(WCScript* this, char* name)
  * @param name
  * @returns resolved name
  */
-static const char* vm_resolve_module(WrenVM* vm,
+static const char* wc_script_resolve_module(WrenVM* vm,
     const char* importer,
     const char* name)
 {
     return name;
 }
 /**
- * vm_log
+ * wc_script_log
  * 
  * Log message
  * @param vm
  * @param text to print
  * @returns none
  */
-static void vm_log(WrenVM* vm,
+static void wc_script_log(WrenVM* vm,
     const char* text)
 {
     fputs(text, stdout);
@@ -183,14 +196,14 @@ static CFWString* read_text_file(char* path)
 }
 
 /**
- * vm_load_module
+ * wc_script_load_module
  * 
  * Load the module from the file system
  * @param vm
  * @param module name
  * @returns loaded module as string
  */
-static char* vm_load_module(WrenVM* vm,
+static char* wc_script_load_module(WrenVM* vm,
     const char* moduleName)
 {
     CFWString* path = cfw_create(cfw_string, "data/wren/");
@@ -204,7 +217,7 @@ static char* vm_load_module(WrenVM* vm,
 }
 
 /**
- * vm_error
+ * wc_script_error
  * 
  * @param vm
  * @param type of error
@@ -214,7 +227,7 @@ static char* vm_load_module(WrenVM* vm,
  * @returns none
  * Display Wren Error
  */
-static void vm_error(WrenVM* vm,
+static void wc_script_error(WrenVM* vm,
     WrenErrorType type,
     const char* module,
     int line,
@@ -234,14 +247,14 @@ static void vm_error(WrenVM* vm,
 }
 
 /**
- * vm_register_foreign_class
+ * wc_script_register_foreign_class
  * 
  * Bind a module / class
  * @param module
  * @param className
  * @returns array of methods
  */
-static WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm,
+static WrenForeignClassMethods wc_script_register_foreign_class(WrenVM* vm,
     const char* module,
     const char* className)
 {
@@ -264,7 +277,7 @@ static WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm,
 }
 
 /**
- * vm_register_foreign_method
+ * wc_script_register_foreign_method
  * 
  * Bind method
  * @param module
@@ -273,7 +286,7 @@ static WrenForeignClassMethods vm_register_foreign_class(WrenVM* vm,
  * @param signature
  * @returns address of method
  */
-static WrenForeignMethodFn vm_register_foreign_method(WrenVM* vm,
+static WrenForeignMethodFn wc_script_register_foreign_method(WrenVM* vm,
     const char* module,
     const char* className,
     bool isStatic,

@@ -1,8 +1,9 @@
+#include <stdio.h>
+#include <wren.h>
 #include "io/io.h"
 #include "math/math.h"
 #include "script.h"
-#include <stdio.h>
-#include <wren.h>
+#include "script-private.h"
 
 /**
  * native builtin class bindings
@@ -19,7 +20,7 @@ const static WrenScript builtIns[] = {
             { "RemoveExtension()", io_path_RemoveExtension },
             { "Join(_)", io_path_Join },
             { "AppendChar(_)", io_path_AppendChar },
-            { "AppendString(_)", io_path_AppemdString },
+            { "AppendString(_)", io_path_AppendString },
             { "Normalize()", io_path_Normalize },
             { "ToString()", io_path_ToString },
         } },

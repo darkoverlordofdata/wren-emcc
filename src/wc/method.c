@@ -2,6 +2,7 @@
 #include <string.h>
 #include <wren.h>
 #include "wc/wc.h"
+#include "wc/script-private.h"
 
 /**
  * WCMethod Type Instance data
@@ -17,6 +18,30 @@ typedef struct WCMethod {
 } WCMethod;
 
 /**
+ * CFWClass Interface
+ */
+static bool wc_method_ctor(void* self, va_list args);
+static bool wc_method_equal(void* ptr1, void* ptr2);
+static uint32_t wc_method_hash(void* self);
+static void* wc_method_copy(void* self);
+static void wc_method_dtor(void* self);
+
+/**
+ * WCMethod Type VTable
+ */
+static CFWClass class = {
+    .name = "WCMethod",
+    .size = sizeof(WCMethod),
+    .ctor = wc_method_ctor,
+    .dtor = wc_method_dtor,
+    .equal = wc_method_equal,
+    .hash = wc_method_hash,
+    .copy = wc_method_copy,
+};
+
+CFWClass* wc_method = &class;
+
+/**
  * WCMethod:
  * Call a script method
  * 
@@ -26,7 +51,7 @@ typedef struct WCMethod {
  * @param name method signature
  * @returns an object that wraps the method
  */
-static bool ctor(void* self, va_list args)
+static bool wc_method_ctor(void* self, va_list args)
 {
     WCMethod* this = self;
     this->script = va_arg(args, void*);
@@ -41,18 +66,19 @@ static bool ctor(void* self, va_list args)
     return true;
 }
 
-static bool equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
-static uint32_t hash(void* self) { return (uint32_t)self; }
-static void* copy(void* self) { return NULL; }
+static bool wc_method_equal(void* ptr1, void* ptr2) { return ptr1 == ptr2; }
+static uint32_t wc_method_hash(void* self) { return (uint32_t)self; }
+static void* wc_method_copy(void* self) { return NULL; }
 
 /**
  * Release resources
  * 
  * @param this instance
  */
-static void dtor(void* self)
+static void wc_method_dtor(void* self)
 {
     WCMethod* this = self;
+
     wrenReleaseHandle(this->script->vm, this->handle);
     wrenReleaseHandle(this->script->vm, this->method);
     this->script = NULL;
@@ -60,21 +86,6 @@ static void dtor(void* self)
     free(this->variable);
     free(this->signature);
 }
-
-/**
- * WCMethod Type VTable
- */
-static CFWClass class = {
-    .name = "WCMethod",
-    .size = sizeof(WCMethod),
-    .ctor = ctor,
-    .dtor = dtor,
-    .equal = equal,
-    .hash = hash,
-    .copy = copy,
-};
-
-CFWClass* wc_method = &class;
 
 /**
  * Call a script method

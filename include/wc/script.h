@@ -1,37 +1,22 @@
 #pragma once
 #include <corefw/corefw.h>
 #include <wren.h>
+// #include "script-private.h"
 /**
  * Bind Wren Script to native functions
  */
 
 extern CFWClass* wc_script;
-typedef struct WCScript {
-    CFWObject obj;
-    WrenVM* vm;
-} WCScript;
-
-typedef struct WrenMethod {
-    char* name;
-    void* addr;
-} WrenMethod;
-
-#define MAX_METHODS 20
-
-typedef struct WrenScript {
-    char* module;
-    char* className;
-    void* allocate;
-    void* finalize;
-    WrenMethod methods[MAX_METHODS];
-} WrenScript;
+typedef struct WCScript WCScript;
+typedef struct WrenMethod WrenMethod;
+typedef struct WrenScript WrenScript; 
 
 typedef enum {
-    ResultSuccess,
-    ResultCompileError,
-    ResultRuntimeError
-} Result;
+    WCSResultSuccess,
+    WCSResultCompileError,
+    WCSResultRuntimeError
+} WCSResult;
 
-
-extern Result wc_execute_string(WCScript* this, char* name);
-extern Result wc_execute_module(WCScript* this, char* name);
+// public methods
+extern WCSResult wc_execute_string(WCScript* this, char* name);
+extern WCSResult wc_execute_module(WCScript* this, char* name);
